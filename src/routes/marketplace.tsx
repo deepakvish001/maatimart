@@ -5,11 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { getDeliveryEta } from "@/lib/delivery-eta";
+import { useCart, cartTotal } from "@/lib/cart-store";
 
 const CATEGORIES = ["all", "vegetables", "fruits", "spices"] as const;
 type Category = (typeof CATEGORIES)[number];
 
-const SORTS = ["newest", "price-asc", "price-desc", "rating"] as const;
+const SORTS = ["newest", "price-asc", "price-desc", "rating", "fastest"] as const;
 type Sort = (typeof SORTS)[number];
 
 const SORT_LABEL: Record<Sort, string> = {
@@ -17,7 +19,10 @@ const SORT_LABEL: Record<Sort, string> = {
   "price-asc": "Price · low to high",
   "price-desc": "Price · high to low",
   rating: "Top rated",
+  fastest: "Fastest delivery",
 };
+
+const TONE_RANK = { express: 0, standard: 1, slow: 2 } as const;
 
 const CAT_ICON: Record<Category, typeof Sprout> = {
   all: Sparkles,
