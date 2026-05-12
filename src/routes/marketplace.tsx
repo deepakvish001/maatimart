@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { getDeliveryEta } from "@/lib/delivery-eta";
 import { useCart, cartTotal } from "@/lib/cart-store";
+import { usePincode } from "@/lib/pincode-store";
 
 const CATEGORIES = ["all", "vegetables", "fruits", "spices"] as const;
 type Category = (typeof CATEGORIES)[number];
