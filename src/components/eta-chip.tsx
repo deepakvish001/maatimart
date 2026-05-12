@@ -1,12 +1,14 @@
-import { Truck, Info, MapPin } from "lucide-react";
+import { Truck, Info, MapPin, Sparkles } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
 import { PincodePicker } from "@/components/pincode-picker";
 
-const FREE_THRESHOLD_RUPEES = 499;
 const CUTOFF_LABEL = "2 PM";
 
 export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?: string }) {
+  const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
+  const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
+  const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
   return (
     <Popover>
       <PopoverTrigger asChild>
