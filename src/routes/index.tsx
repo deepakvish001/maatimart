@@ -231,9 +231,15 @@ function Home() {
               ))}
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-            {popular.map((p) => <ProductCard key={p.id} p={p} />)}
-          </div>
+          {productsError ? (
+            <SectionError message="Couldn't load popular products." onRetry={() => refetchProducts()} />
+          ) : productsLoading ? (
+            <ProductGridSkeleton count={5} />
+          ) : (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+              {popular.map((p) => <ProductCard key={p.id} p={p} />)}
+            </div>
+          )}
         </section>
 
         {/* DAILY BEST SELLS */}
