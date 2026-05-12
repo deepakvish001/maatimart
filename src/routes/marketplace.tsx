@@ -63,6 +63,9 @@ function Marketplace() {
   const setSearch = (patch: Partial<MarketplaceSearch>) =>
     navigate({ search: (prev: MarketplaceSearch) => ({ ...prev, ...patch }) });
 
+  const cartItems = useCart((s) => s.items);
+  const cartSubtotal = cartTotal(cartItems);
+
   const { data, isLoading } = useQuery({
     queryKey: ["products", category, organic, q, sort],
     queryFn: async () => {
@@ -77,6 +80,7 @@ function Marketplace() {
         case "price-asc": query = query.order("price_paise", { ascending: true }); break;
         case "price-desc": query = query.order("price_paise", { ascending: false }); break;
         case "rating": query = query.order("rating_avg", { ascending: false }); break;
+        case "fastest": query = query.order("stock", { ascending: false, nullsFirst: false }); break;
         default: query = query.order("created_at", { ascending: false });
       }
       const { data, error } = await query;
@@ -85,7 +89,22 @@ function Marketplace() {
     },
   });
 
-  const count = data?.length ?? 0;
+  const sortedData = (() => {
+    if (!data || sort !== "fastest") return data;
+    return [...data]
+      .map((p) => ({
+        p,
+        rank: TONE_RANK[getDeliveryEta({
+          stock: p.stock,
+          cartTotalPaise: cartSubtotal,
+          addingPaise: p.price_paise,
+        }).tone],
+      }))
+      .sort((a, b) => a.rank - b.rank)
+      .map((x) => x.p);
+  })();
+
+  const count = sortedData?.length ?? 0;
   const hasFilters = category !== "all" || organic || q !== "" || sort !== "newest";
 
   return (
