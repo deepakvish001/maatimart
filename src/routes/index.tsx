@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   Leaf, Truck, Sprout, ArrowRight, Tag, Sparkles, Star,
-  Headphones, RotateCcw, Package, Quote, Mail,
+  Headphones, RotateCcw, Package, Quote, Mail, Search, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
