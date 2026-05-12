@@ -258,7 +258,7 @@ function Home() {
                 <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
                     {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                    <Countdown target={dealEnds} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
+                    <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
                   </div>
                   <div className="p-5">
                     <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
