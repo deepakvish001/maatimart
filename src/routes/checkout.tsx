@@ -81,11 +81,12 @@ function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [shippingId, setShippingId] = useState<ShippingId>("standard");
   const [submitting, setSubmitting] = useState(false);
+  const { pincode } = usePincode();
 
   const shipping = SHIPPING_OPTIONS.find((o) => o.id === shippingId)!;
   const deliveryFee = useMemo(() => shipping.fee(subtotal), [shipping, subtotal]);
   const total = subtotal + deliveryFee;
-  const eta = useMemo(() => shipping.eta(subtotal), [shipping, subtotal]);
+  const eta = useMemo(() => shipping.eta(subtotal, pincode), [shipping, subtotal, pincode]);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login", search: { redirect: "/checkout" } });
