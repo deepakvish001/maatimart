@@ -119,16 +119,31 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("product_reviews")
-        .select("id,user_id,rating,comment,created_at,products(name,farms(name))")
+        .select("id,user_id,rating,comment,created_at,product_id")
         .not("comment", "is", null)
         .gte("rating", 4)
         .order("rating", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
-      return (data ?? [])
+      const reviews = (data ?? [])
         .filter((r) => (r.comment ?? "").trim().length >= 12)
         .slice(0, 3);
+      if (reviews.length === 0) return [];
+      const productIds = Array.from(new Set(reviews.map((r) => r.product_id)));
+      const { data: prods } = await supabase
+        .from("products")
+        .select("id,name,farm_id")
+        .in("id", productIds);
+      const farmIds = Array.from(new Set((prods ?? []).map((p) => p.farm_id)));
+      const { data: farms } = farmIds.length
+        ? await supabase.from("farms").select("id,name").in("id", farmIds)
+        : { data: [] as { id: string; name: string }[] };
+      const farmMap = new Map((farms ?? []).map((f) => [f.id, f.name]));
+      const prodMap = new Map(
+        (prods ?? []).map((p) => [p.id, { name: p.name, farms: { name: farmMap.get(p.farm_id) ?? "" } }])
+      );
+      return reviews.map((r) => ({ ...r, products: prodMap.get(r.product_id) ?? null }));
     },
   });
 
