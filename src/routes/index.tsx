@@ -442,15 +442,69 @@ function Home() {
               </div>
               <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
             </div>
+            <div className="grid gap-3 md:grid-cols-[1fr_auto_auto_auto_auto] mb-6 p-3 rounded-2xl border border-border bg-background">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={farmQuery}
+                  onChange={(e) => setFarmQuery(e.target.value)}
+                  placeholder="Search farms by name or region…"
+                  className="w-full h-10 pl-9 pr-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
+                />
+              </div>
+              <select
+                value={farmRegion}
+                onChange={(e) => setFarmRegion(e.target.value)}
+                aria-label="Filter by region"
+                className="h-10 px-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
+              >
+                <option value="all">All regions</option>
+                {farmRegions.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+              <select
+                value={String(farmMinRating)}
+                onChange={(e) => setFarmMinRating(Number(e.target.value))}
+                aria-label="Minimum rating"
+                className="h-10 px-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
+              >
+                <option value="0">Any rating</option>
+                <option value="3">3★ & up</option>
+                <option value="4">4★ & up</option>
+                <option value="4.5">4.5★ & up</option>
+              </select>
+              <select
+                value={farmCategory}
+                onChange={(e) => setFarmCategory(e.target.value)}
+                aria-label="Filter by category"
+                className="h-10 px-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
+              >
+                <option value="all">All categories</option>
+                {farmCategories.map((c) => <option key={c} value={c} className="capitalize">{c}</option>)}
+              </select>
+              {farmFiltersActive && (
+                <button
+                  type="button"
+                  onClick={() => { setFarmQuery(""); setFarmRegion("all"); setFarmMinRating(0); setFarmCategory("all"); }}
+                  className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl bg-muted text-sm font-semibold hover:bg-muted/70"
+                >
+                  <X className="h-3.5 w-3.5" /> Clear
+                </button>
+              )}
+            </div>
             {farmsError ? (
               <SectionError message="Couldn't load farms." onRetry={() => refetchFarms()} />
             ) : farmsLoading ? (
               <div className="grid md:grid-cols-3 gap-6">
                 {Array.from({ length: 3 }).map((_, i) => <FarmCardSkeleton key={i} />)}
               </div>
+            ) : filteredFarms.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-background p-10 text-center text-sm text-muted-foreground">
+                No farms match these filters. <button onClick={() => { setFarmQuery(""); setFarmRegion("all"); setFarmMinRating(0); setFarmCategory("all"); }} className="text-primary font-semibold hover:underline">Reset</button>
+              </div>
             ) : (
               <div className="grid md:grid-cols-3 gap-6">
-                {(farms ?? []).map((f) => {
+                {filteredFarms.slice(0, 6).map((f) => {
                   const img = resolveImage(f.image_url);
                   return (
                     <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
