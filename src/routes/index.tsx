@@ -89,8 +89,8 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("farms")
-        .select("id,name,region,story,image_url,products(rating_avg,rating_count,is_active)")
-        .limit(3);
+        .select("id,name,region,story,image_url,products(category,rating_avg,rating_count,is_active)")
+        .limit(24);
       if (error) throw error;
       return (data ?? []).map((f) => {
         const active = (f.products ?? []).filter((p: { is_active: boolean }) => p.is_active);
@@ -99,7 +99,8 @@ function Home() {
         const avg = rated.length
           ? rated.reduce((s: number, p: { rating_avg: number; rating_count: number }) => s + (p.rating_avg ?? 0) * p.rating_count, 0) / Math.max(totalReviews, 1)
           : 0;
-        return { ...f, productCount: active.length, avgRating: avg, totalReviews };
+        const categories = Array.from(new Set(active.map((p: { category: string }) => p.category).filter(Boolean)));
+        return { ...f, productCount: active.length, avgRating: avg, totalReviews, categories };
       });
     },
   });
