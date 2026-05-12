@@ -14,16 +14,246 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      farms: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          name: string
+          owner_id: string
+          region: string
+          story: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          owner_id: string
+          region: string
+          story?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          owner_id?: string
+          region?: string
+          story?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          farm_id: string
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          qty: number
+          unit: string
+          unit_price_paise: number
+        }
+        Insert: {
+          created_at?: string
+          farm_id: string
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          qty: number
+          unit: string
+          unit_price_paise: number
+        }
+        Update: {
+          created_at?: string
+          farm_id?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          qty?: number
+          unit?: string
+          unit_price_paise?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          address: string
+          consumer_id: string
+          created_at: string
+          id: string
+          phone: string | null
+          status: string
+          total_paise: number
+        }
+        Insert: {
+          address: string
+          consumer_id: string
+          created_at?: string
+          id?: string
+          phone?: string | null
+          status?: string
+          total_paise: number
+        }
+        Update: {
+          address?: string
+          consumer_id?: string
+          created_at?: string
+          id?: string
+          phone?: string | null
+          status?: string
+          total_paise?: number
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          farm_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_organic: boolean
+          name: string
+          price_paise: number
+          stock: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          farm_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_organic?: boolean
+          name: string
+          price_paise: number
+          stock?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          farm_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_organic?: boolean
+          name?: string
+          price_paise?: number
+          stock?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "consumer" | "farmer" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +380,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["consumer", "farmer", "admin"],
+    },
   },
 } as const
