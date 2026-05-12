@@ -15,6 +15,13 @@ import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
+import {
+  ProductGridSkeleton,
+  DealCardSkeleton,
+  FarmCardSkeleton,
+  TabListSkeleton,
+  SectionError,
+} from "@/components/home-skeletons";
 
 export const Route = createFileRoute("/")({
   head: () => ({
