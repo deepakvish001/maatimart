@@ -20,7 +20,7 @@ interface ShippingOption {
   blurb: string;
   icon: typeof Truck;
   fee: (subtotalPaise: number) => number;
-  eta: (subtotalPaise: number) => { label: string; tone: EtaTone; detail: string };
+  eta: (subtotalPaise: number, pincode: string | null) => { label: string; tone: EtaTone; detail: string; zone?: string; serviceable?: boolean; pincode?: string | null };
 }
 
 const SHIPPING_OPTIONS: ShippingOption[] = [
