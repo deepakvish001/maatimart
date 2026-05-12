@@ -66,6 +66,7 @@ function Marketplace() {
 
   const cartItems = useCart((s) => s.items);
   const cartSubtotal = cartTotal(cartItems);
+  const { pincode } = usePincode();
 
   const { data, isLoading } = useQuery({
     queryKey: ["products", category, organic, q, sort],
