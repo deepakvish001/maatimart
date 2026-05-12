@@ -5,6 +5,7 @@ export type VisitSource =
   | "marketplace"
   | "product-page"
   | "search"
+  | "wishlist"
   | "other";
 
 /**
