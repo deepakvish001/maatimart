@@ -166,6 +166,7 @@ function FarmPage() {
             </div>
             <div className="relative">
               {img && <img src={img} alt={farm.name} className="aspect-square w-full object-cover rounded-2xl shadow-lg" />}
+              <SaveFarmButton farmId={farm.id} className="absolute top-4 right-4 h-11 w-11" />
             </div>
           </div>
         </section>
