@@ -207,12 +207,52 @@ function Home() {
           </div>
         </section>
 
+        {/* Today's Deals */}
+        <section className="px-6 py-16 mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
+                <Tag className="h-3.5 w-3.5" /> Today's deals
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl">Best prices on the harvest</h2>
+              <p className="text-sm text-muted-foreground mt-1">Limited stock · ends midnight</p>
+            </div>
+            <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
+              <Link to="/marketplace">All deals <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+            {(deals ?? []).map((p) => <ProductCard key={p.id} p={p} />)}
+          </div>
+        </section>
+
+        {/* Fresh Arrivals */}
+        <section className="px-6 py-16 bg-card/40 border-y border-border">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent mb-3">
+                  <Sparkles className="h-3.5 w-3.5" /> Just in
+                </div>
+                <h2 className="font-display text-3xl md:text-4xl">Fresh arrivals</h2>
+                <p className="text-sm text-muted-foreground mt-1">Newly listed by our growers</p>
+              </div>
+              <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
+                <Link to="/marketplace">See all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+              </Button>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden bg-background">
+              {(arrivals ?? []).map((p) => <ProductCard key={p.id} p={p} />)}
+            </div>
+          </div>
+        </section>
+
         {/* Featured products */}
         <section className="px-6 py-16 mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="font-display text-3xl md:text-4xl">Featured this week</h2>
-              <p className="text-sm text-muted-foreground mt-1">Picked fresh, delivered today</p>
+              <p className="text-sm text-muted-foreground mt-1">Hand-picked by the Maati team</p>
             </div>
             <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
               <Link to="/marketplace">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
@@ -223,26 +263,44 @@ function Home() {
           </div>
         </section>
 
-        {/* Farms */}
+        {/* Top Farms */}
         <section className="px-6 py-16 bg-card/50 border-y border-border">
           <div className="mx-auto max-w-7xl">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-4">
-                <Sprout className="h-3.5 w-3.5" /> Meet the growers
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
+                  <Sprout className="h-3.5 w-3.5" /> Top farms
+                </div>
+                <h2 className="font-display text-3xl md:text-4xl">Growers our customers love</h2>
+                <p className="text-sm text-muted-foreground mt-1">Traceable produce, real families behind every basket</p>
               </div>
-              <h2 className="font-display text-3xl md:text-4xl mb-3">Real farms behind every basket</h2>
-              <p className="text-muted-foreground">Every product on Maati Mart is traceable to the family that grew it.</p>
+              <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
+                <Link to="/marketplace">Shop their goods <ArrowRight className="ml-1 h-4 w-4" /></Link>
+              </Button>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {(farms ?? []).map((f) => {
                 const img = resolveImage(f.image_url);
                 return (
                   <Link to="/farm/$id" params={{ id: f.id }} key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
-                    {img && <img src={img} alt={f.name} loading="lazy" width={1200} height={900} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                    <div className="relative">
+                      {img && <img src={img} alt={f.name} loading="lazy" width={1200} height={900} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                      {f.avgRating > 0 && (
+                        <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
+                          <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+                        </span>
+                      )}
+                      <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
+                        {f.productCount} items
+                      </span>
+                    </div>
                     <div className="p-5">
                       <h3 className="font-display text-xl mb-1">{f.name}</h3>
                       <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
                       <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{f.story}</p>
+                      <div className="mt-4 inline-flex items-center text-sm font-semibold text-primary">
+                        Visit farm <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
                   </Link>
                 );
