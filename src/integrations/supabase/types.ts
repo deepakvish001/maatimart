@@ -17,6 +17,7 @@ export type Database = {
       farms: {
         Row: {
           created_at: string
+          delivery_pincodes: string[]
           id: string
           image_url: string | null
           name: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          delivery_pincodes?: string[]
           id?: string
           image_url?: string | null
           name: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          delivery_pincodes?: string[]
           id?: string
           image_url?: string | null
           name?: string
@@ -44,6 +47,36 @@ export type Database = {
           region?: string
           story?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -105,6 +138,30 @@ export type Database = {
           },
         ]
       }
+      order_status_events: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          order_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string
@@ -135,6 +192,36 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -145,8 +232,11 @@ export type Database = {
           image_url: string | null
           is_active: boolean
           is_organic: boolean
+          low_stock_threshold: number
           name: string
           price_paise: number
+          rating_avg: number
+          rating_count: number
           stock: number
           unit: string
           updated_at: string
@@ -160,8 +250,11 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean
           is_organic?: boolean
+          low_stock_threshold?: number
           name: string
           price_paise: number
+          rating_avg?: number
+          rating_count?: number
           stock?: number
           unit?: string
           updated_at?: string
@@ -175,8 +268,11 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean
           is_organic?: boolean
+          low_stock_threshold?: number
           name?: string
           price_paise?: number
+          rating_avg?: number
+          rating_count?: number
           stock?: number
           unit?: string
           updated_at?: string
@@ -239,6 +335,27 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -249,6 +366,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      user_has_delivered_product: {
+        Args: { _product: string; _user: string }
         Returns: boolean
       }
     }

@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, User as UserIcon } from "lucide-react";
+import { ShoppingBag, User as UserIcon, Heart } from "lucide-react";
 import { useCart, cartCount } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 export function SiteHeader() {
   const items = useCart((s) => s.items);
@@ -34,7 +35,13 @@ export function SiteHeader() {
             )}
           </nav>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {user && (
+            <Link to="/wishlist" className="inline-flex items-center justify-center rounded-md p-2 hover:bg-muted transition-colors" aria-label="Wishlist">
+              <Heart className="h-5 w-5" />
+            </Link>
+          )}
+          <NotificationsBell />
           <Link to="/cart" className="relative inline-flex items-center justify-center rounded-md p-2 hover:bg-muted transition-colors">
             <ShoppingBag className="h-5 w-5" />
             {count > 0 && (

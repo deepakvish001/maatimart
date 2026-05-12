@@ -9,6 +9,8 @@ import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { useCart } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
+import { StarRating } from "@/components/star-rating";
+import { ProductReviews } from "@/components/product-reviews";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -24,7 +26,7 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,name,description,unit,price_paise,image_url,is_organic,stock,farm_id,farms(name,region,story,image_url)")
+        .select("id,name,description,unit,price_paise,image_url,is_organic,stock,farm_id,rating_avg,rating_count,farms(id,name,region,story,image_url)")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -57,9 +59,12 @@ function ProductPage() {
                   <span className="font-mono text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2 py-1">Organic</span>
                 )}
               </div>
-              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-6">
+              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
                 {p.farms?.name} · {p.farms?.region}
               </p>
+              {p.rating_count > 0 && (
+                <div className="mb-4"><StarRating value={p.rating_avg} count={p.rating_count} size={16} /></div>
+              )}
               <p className="font-mono text-3xl text-accent font-semibold mb-2">
                 {formatINR(p.price_paise)}<span className="text-sm font-normal text-muted-foreground"> / {p.unit}</span>
               </p>
@@ -89,12 +94,16 @@ function ProductPage() {
               {p.farms && (
                 <div className="mt-8 pt-8 border-t border-border">
                   <h2 className="font-display text-xl mb-2">About the farm</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{p.farms.story}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">{p.farms.story}</p>
+                  <Link to="/farm/$id" params={{ id: p.farms.id }} className="font-mono text-[10px] uppercase tracking-widest text-primary border-b border-primary/30 hover:border-primary">
+                    Visit {p.farms.name} →
+                  </Link>
                 </div>
               )}
             </div>
           </div>
         )}
+        {p && <ProductReviews productId={p.id} />}
       </main>
       <SiteFooter />
     </div>

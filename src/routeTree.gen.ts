@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
@@ -22,7 +23,13 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as FarmerProfileRouteImport } from './routes/farmer.profile'
 import { Route as FarmerOrdersRouteImport } from './routes/farmer.orders'
 import { Route as FarmerListingsRouteImport } from './routes/farmer.listings'
+import { Route as FarmIdRouteImport } from './routes/farm.$id'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -88,6 +95,11 @@ const FarmerListingsRoute = FarmerListingsRouteImport.update({
   path: '/listings',
   getParentRoute: () => FarmerRoute,
 } as any)
+const FarmIdRoute = FarmIdRouteImport.update({
+  id: '/farm/$id',
+  path: '/farm/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,6 +110,8 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRoute
   '/orders': typeof OrdersRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
+  '/farm/$id': typeof FarmIdRoute
   '/farmer/listings': typeof FarmerListingsRoute
   '/farmer/orders': typeof FarmerOrdersRoute
   '/farmer/profile': typeof FarmerProfileRoute
@@ -112,6 +126,8 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/orders': typeof OrdersRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
+  '/farm/$id': typeof FarmIdRoute
   '/farmer/listings': typeof FarmerListingsRoute
   '/farmer/orders': typeof FarmerOrdersRoute
   '/farmer/profile': typeof FarmerProfileRoute
@@ -128,6 +144,8 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRoute
   '/orders': typeof OrdersRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
+  '/farm/$id': typeof FarmIdRoute
   '/farmer/listings': typeof FarmerListingsRoute
   '/farmer/orders': typeof FarmerOrdersRoute
   '/farmer/profile': typeof FarmerProfileRoute
@@ -145,6 +163,8 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/orders'
     | '/signup'
+    | '/wishlist'
+    | '/farm/$id'
     | '/farmer/listings'
     | '/farmer/orders'
     | '/farmer/profile'
@@ -159,6 +179,8 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/orders'
     | '/signup'
+    | '/wishlist'
+    | '/farm/$id'
     | '/farmer/listings'
     | '/farmer/orders'
     | '/farmer/profile'
@@ -174,6 +196,8 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/orders'
     | '/signup'
+    | '/wishlist'
+    | '/farm/$id'
     | '/farmer/listings'
     | '/farmer/orders'
     | '/farmer/profile'
@@ -190,11 +214,20 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRoute
   OrdersRoute: typeof OrdersRoute
   SignupRoute: typeof SignupRoute
+  WishlistRoute: typeof WishlistRoute
+  FarmIdRoute: typeof FarmIdRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -286,6 +319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FarmerListingsRouteImport
       parentRoute: typeof FarmerRoute
     }
+    '/farm/$id': {
+      id: '/farm/$id'
+      path: '/farm/$id'
+      fullPath: '/farm/$id'
+      preLoaderRoute: typeof FarmIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -315,6 +355,8 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRoute,
   OrdersRoute: OrdersRoute,
   SignupRoute: SignupRoute,
+  WishlistRoute: WishlistRoute,
+  FarmIdRoute: FarmIdRoute,
   ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport

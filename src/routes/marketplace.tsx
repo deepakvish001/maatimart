@@ -26,7 +26,7 @@ function Marketplace() {
     queryFn: async () => {
       let q = supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,farms(name,region)")
+        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,farms(name,region)")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
       if (category !== "all") q = q.eq("category", category);
