@@ -35,7 +35,7 @@ function Marketplace() {
   const navigate = useNavigate({ from: Route.fullPath });
 
   const setSearch = (patch: Partial<MarketplaceSearch>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: MarketplaceSearch) => ({ ...prev, ...patch }) });
 
   const { data, isLoading } = useQuery({
     queryKey: ["products", category, organic, q],
