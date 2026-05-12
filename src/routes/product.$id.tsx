@@ -41,10 +41,13 @@ function ProductPage() {
   const farmImg = p?.farms?.image_url ? resolveImage(p.farms.image_url) : null;
   const productImg = p ? resolveImage(p.image_url) : null;
   const inStock = (p?.stock ?? 0) > 0;
+  const { pincode } = usePincode();
   const eta = getDeliveryEta({
     stock: p?.stock,
     cartTotalPaise: cartTotal(items),
     addingPaise: (p?.price_paise ?? 0) * qty,
+    userPincode: pincode,
+    farmPincodes: p?.farms?.delivery_pincodes ?? null,
   });
 
   const benefits = [
