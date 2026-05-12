@@ -91,8 +91,8 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             <div className="mt-2 text-[11px] text-muted-foreground">New listing</div>
           )}
 
-          <div className={`mt-3 inline-flex items-center gap-1.5 self-start rounded-full border px-2 py-0.5 text-[10px] font-semibold ${etaToneClasses(eta.tone)}`}>
-            <Truck className="h-3 w-3" /> {eta.label}
+          <div className="mt-3" onClick={(e) => e.preventDefault()}>
+            <EtaChip eta={eta} />
           </div>
 
           <div className="mt-3 flex items-end justify-between gap-2">
