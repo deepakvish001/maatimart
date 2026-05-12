@@ -393,42 +393,50 @@ function Home() {
               </div>
               <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {(farms ?? []).map((f) => {
-                const img = resolveImage(f.image_url);
-                return (
-                  <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
-                    <div className="relative">
-                      {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                      <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
-                        {f.productCount} items
-                      </span>
-                      {f.avgRating > 0 && (
-                        <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
-                          <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+            {farmsError ? (
+              <SectionError message="Couldn't load farms." onRetry={() => refetchFarms()} />
+            ) : farmsLoading ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {Array.from({ length: 3 }).map((_, i) => <FarmCardSkeleton key={i} />)}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {(farms ?? []).map((f) => {
+                  const img = resolveImage(f.image_url);
+                  return (
+                    <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
+                      <div className="relative">
+                        {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                        <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
+                          {f.productCount} items
                         </span>
-                      )}
-                    </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
-                      <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
-                      <div className="flex items-center gap-2 mb-3 text-xs">
-                        <StarRating value={f.avgRating} count={f.totalReviews} />
-                        {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
+                        {f.avgRating > 0 && (
+                          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
+                            <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
-                      <Link
-                        to="/farm/$id"
-                        params={{ id: f.id }}
-                        className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
-                      >
-                        Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                      <div className="p-5 flex flex-col flex-1">
+                        <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
+                        <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
+                        <div className="flex items-center gap-2 mb-3 text-xs">
+                          <StarRating value={f.avgRating} count={f.totalReviews} />
+                          {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
+                        <Link
+                          to="/farm/$id"
+                          params={{ id: f.id }}
+                          className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
+                        >
+                          Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 
