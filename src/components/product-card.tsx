@@ -1,11 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Plus, Leaf } from "lucide-react";
 import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { useWishlist } from "@/lib/wishlist-store";
-import { useCart } from "@/lib/cart-store";
 import { StarRating } from "@/components/star-rating";
-import { toast } from "sonner";
 
 export interface ProductCardData {
   id: string;
@@ -22,20 +20,12 @@ export interface ProductCardData {
 export function ProductCard({ p }: { p: ProductCardData }) {
   const img = resolveImage(p.image_url);
   const { has, toggle, ready } = useWishlist();
-  const addToCart = useCart((s) => s.add);
+  const navigate = useNavigate();
   const saved = has(p.id);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
-    addToCart({
-      id: p.id,
-      name: p.name,
-      unit: p.unit,
-      price_paise: p.price_paise,
-      image_url: p.image_url,
-      qty: 1,
-    });
-    toast.success(`${p.name} added to cart`);
+    navigate({ to: "/product/$id", params: { id: p.id } });
   };
 
   return (
