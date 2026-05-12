@@ -90,7 +90,11 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             <div className="mt-2 text-[11px] text-muted-foreground">New listing</div>
           )}
 
-          <div className="mt-4 flex items-end justify-between gap-2">
+          <div className={`mt-3 inline-flex items-center gap-1.5 self-start rounded-full border px-2 py-0.5 text-[10px] font-semibold ${etaToneClasses(eta.tone)}`}>
+            <Truck className="h-3 w-3" /> {eta.label}
+          </div>
+
+          <div className="mt-3 flex items-end justify-between gap-2">
             <div className="flex flex-col">
               <span className="font-display text-xl font-bold text-primary leading-none">
                 {formatINR(p.price_paise)}
