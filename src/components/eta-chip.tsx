@@ -45,7 +45,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
   const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
   const countdown = useCutoffCountdown(open);
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
