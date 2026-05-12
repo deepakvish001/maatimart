@@ -15,6 +15,13 @@ import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
+import {
+  ProductGridSkeleton,
+  DealCardSkeleton,
+  FarmCardSkeleton,
+  TabListSkeleton,
+  SectionError,
+} from "@/components/home-skeletons";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,7 +59,12 @@ const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
 function Home() {
   const [email, setEmail] = useState("");
 
-  const { data: products } = useQuery({
+  const {
+    data: products,
+    isLoading: productsLoading,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useQuery({
     queryKey: ["home-products"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -65,7 +77,12 @@ function Home() {
     },
   });
 
-  const { data: farms } = useQuery({
+  const {
+    data: farms,
+    isLoading: farmsLoading,
+    isError: farmsError,
+    refetch: refetchFarms,
+  } = useQuery({
     queryKey: ["home-farms"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -214,9 +231,15 @@ function Home() {
               ))}
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-            {popular.map((p) => <ProductCard key={p.id} p={p} />)}
-          </div>
+          {productsError ? (
+            <SectionError message="Couldn't load popular products." onRetry={() => refetchProducts()} />
+          ) : productsLoading ? (
+            <ProductGridSkeleton count={5} />
+          ) : (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+              {popular.map((p) => <ProductCard key={p.id} p={p} />)}
+            </div>
+          )}
         </section>
 
         {/* DAILY BEST SELLS */}
@@ -234,9 +257,17 @@ function Home() {
               <div className="absolute -right-10 -bottom-10 h-44 w-44 rounded-full bg-primary-foreground/10" />
               <Leaf className="absolute right-6 top-6 h-10 w-10 opacity-30" />
             </div>
-            <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-              {dailyBest.map((p) => <ProductCard key={p.id} p={p} />)}
-            </div>
+            {productsError ? (
+              <div className="lg:col-span-3"><SectionError message="Couldn't load best sellers." onRetry={() => refetchProducts()} /></div>
+            ) : productsLoading ? (
+              <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-background"><div className="animate-pulse bg-muted/60 aspect-[4/3]" /><div className="p-4 space-y-2"><div className="h-4 bg-muted/60 rounded animate-pulse w-3/4" /><div className="h-3 bg-muted/60 rounded animate-pulse w-1/2" /></div></div>)}
+              </div>
+            ) : (
+              <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+                {dailyBest.map((p) => <ProductCard key={p.id} p={p} />)}
+              </div>
+            )}
           </div>
         </section>
 
@@ -251,58 +282,74 @@ function Home() {
             </div>
             <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline hidden md:inline">All deals →</Link>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {deals.map((p, i) => {
-              const img = resolveImage(p.image_url);
-              return (
-                <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
-                    {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                    <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
-                    {p.farm && <p className="text-xs text-muted-foreground mt-1 truncate">{p.farm.name} · {p.farm.region}</p>}
-                    <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="font-display text-xl font-bold text-primary">{formatINR(p.price_paise)}</span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">+ Add</span>
+          {productsError ? (
+            <SectionError message="Couldn't load today's deals." onRetry={() => refetchProducts()} />
+          ) : productsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => <DealCardSkeleton key={i} />)}
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {deals.map((p, i) => {
+                const img = resolveImage(p.image_url);
+                return (
+                  <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
+                      {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                      <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                    <div className="p-5">
+                      <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
+                      {p.farm && <p className="text-xs text-muted-foreground mt-1 truncate">{p.farm.name} · {p.farm.region}</p>}
+                      <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="font-display text-xl font-bold text-primary">{formatINR(p.price_paise)}</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">+ Add</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* TABBED LISTS */}
         <section className="px-4 md:px-6 mx-auto max-w-7xl">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tabSections.map((sec) => (
-              <div key={sec.key}>
-                <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">{sec.label}</h3>
-                <ul className="space-y-4">
-                  {sec.items.map((p) => {
-                    const img = resolveImage(p.image_url);
-                    return (
-                      <li key={p.id}>
-                        <Link to="/product/$id" params={{ id: p.id }} className="flex gap-3 group">
-                          <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border">
-                            {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</div>
-                            <div className="mt-1"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
-                            <div className="mt-1 text-sm font-bold text-primary">{formatINR(p.price_paise)}</div>
-                          </div>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => <TabListSkeleton key={i} />)}
+            </div>
+          ) : productsError ? (
+            <SectionError onRetry={() => refetchProducts()} />
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {tabSections.map((sec) => (
+                <div key={sec.key}>
+                  <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">{sec.label}</h3>
+                  <ul className="space-y-4">
+                    {sec.items.map((p) => {
+                      const img = resolveImage(p.image_url);
+                      return (
+                        <li key={p.id}>
+                          <Link to="/product/$id" params={{ id: p.id }} className="flex gap-3 group">
+                            <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border">
+                              {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</div>
+                              <div className="mt-1"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
+                              <div className="mt-1 text-sm font-bold text-primary">{formatINR(p.price_paise)}</div>
+                            </div>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* TESTIMONIALS */}
@@ -346,42 +393,50 @@ function Home() {
               </div>
               <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {(farms ?? []).map((f) => {
-                const img = resolveImage(f.image_url);
-                return (
-                  <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
-                    <div className="relative">
-                      {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                      <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
-                        {f.productCount} items
-                      </span>
-                      {f.avgRating > 0 && (
-                        <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
-                          <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+            {farmsError ? (
+              <SectionError message="Couldn't load farms." onRetry={() => refetchFarms()} />
+            ) : farmsLoading ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {Array.from({ length: 3 }).map((_, i) => <FarmCardSkeleton key={i} />)}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {(farms ?? []).map((f) => {
+                  const img = resolveImage(f.image_url);
+                  return (
+                    <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
+                      <div className="relative">
+                        {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                        <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
+                          {f.productCount} items
                         </span>
-                      )}
-                    </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
-                      <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
-                      <div className="flex items-center gap-2 mb-3 text-xs">
-                        <StarRating value={f.avgRating} count={f.totalReviews} />
-                        {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
+                        {f.avgRating > 0 && (
+                          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
+                            <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
-                      <Link
-                        to="/farm/$id"
-                        params={{ id: f.id }}
-                        className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
-                      >
-                        Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                      <div className="p-5 flex flex-col flex-1">
+                        <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
+                        <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
+                        <div className="flex items-center gap-2 mb-3 text-xs">
+                          <StarRating value={f.avgRating} count={f.totalReviews} />
+                          {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
+                        <Link
+                          to="/farm/$id"
+                          params={{ id: f.id }}
+                          className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
+                        >
+                          Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 
