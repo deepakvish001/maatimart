@@ -27,7 +27,7 @@ function WishlistPage() {
       if (!ids.length) return [];
       const { data: products } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,farms(name,region)")
+        .select("id,name,unit,price_paise,image_url,is_organic,farms(name,region,delivery_pincodes)")
         .in("id", ids);
       return (products ?? []).map((p) => ({ ...p, farm: p.farms }));
     },
