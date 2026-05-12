@@ -4,6 +4,8 @@
 // optionally the user's delivery pincode + the farm's serviceable
 // pincode list.
 
+import { getDeliveryZone, formatCutoffLabel } from "./delivery-zones";
+
 export type EtaTone = "express" | "standard" | "slow";
 export type EtaZone = "local" | "regional" | "out-of-zone" | "unknown";
 
@@ -19,10 +21,13 @@ export interface DeliveryEta {
   freeThresholdPaise: number;
   remainingToFreePaise: number;
   expressEligible: boolean;
+  /** City-aware same-day cutoff derived from pincode. */
+  cutoffHour: number;
+  cutoffLabel: string;
+  cityLabel: string;
 }
 
 const FREE_THRESHOLD_PAISE = 49900; // ₹499 — matches cart-store / cart page
-const SAME_DAY_CUTOFF_HOUR = 14;     // before 2 PM local
 const RESTOCK_DAYS = "3–5 days";
 
 function fmt(date: Date): string {
@@ -55,6 +60,10 @@ export function getDeliveryEta(opts: {
   const remaining = Math.max(0, free - total);
   const expressEligible = total >= free;
   const now = opts.now ?? new Date();
+  const deliveryZone = getDeliveryZone(userPincode);
+  const cutoffHour = deliveryZone.cutoffHour;
+  const cutoffLabel = formatCutoffLabel(cutoffHour);
+  const cityLabel = deliveryZone.city;
 
   const base = {
     zone,
@@ -63,6 +72,9 @@ export function getDeliveryEta(opts: {
     freeThresholdPaise: free,
     remainingToFreePaise: remaining,
     expressEligible,
+    cutoffHour,
+    cutoffLabel,
+    cityLabel,
   };
 
   if (stock <= 0) {
@@ -90,7 +102,7 @@ export function getDeliveryEta(opts: {
   // add a buffer day.
   if (zone === "regional") {
     const target = new Date(now);
-    const offset = expressEligible ? 1 : (now.getHours() < SAME_DAY_CUTOFF_HOUR ? 2 : 3);
+    const offset = expressEligible ? 1 : (now.getHours() < cutoffHour ? 2 : 3);
     target.setDate(target.getDate() + offset);
     return {
       ...base,
@@ -104,14 +116,14 @@ export function getDeliveryEta(opts: {
   }
 
   // Local zone or unknown (no pincode set) — original logic.
-  if (expressEligible && now.getHours() < SAME_DAY_CUTOFF_HOUR) {
+  if (expressEligible && now.getHours() < cutoffHour) {
     return {
       ...base,
       label: "Today by 9 PM",
       tone: "express",
       detail: zone === "local"
-        ? `Free express to ${userPincode} — order before 2 PM.`
-        : "Free express delivery — order before 2 PM. Set your pincode for an exact ETA.",
+        ? `Free express to ${userPincode} — order before ${cutoffLabel}.`
+        : `Free express delivery — order before ${cutoffLabel}. Set your pincode for an exact ETA.`,
       serviceable: true,
     };
   }
@@ -133,7 +145,7 @@ export function getDeliveryEta(opts: {
 
   // Standard: next-day if before cutoff, else day-after.
   const target = new Date(now);
-  const offset = now.getHours() < SAME_DAY_CUTOFF_HOUR ? 1 : 2;
+  const offset = now.getHours() < cutoffHour ? 1 : 2;
   target.setDate(target.getDate() + offset);
   const baseDetail = remaining > 0
     ? `Add ₹${(remaining / 100).toFixed(0)} more for free express delivery.`
