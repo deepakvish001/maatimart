@@ -16,6 +16,7 @@ import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { VisitFarmLink } from "@/components/visit-farm-link";
+import { SaveFarmButton } from "@/components/save-farm-button";
 import {
   ProductGridSkeleton,
   DealCardSkeleton,
@@ -439,6 +440,7 @@ function Home() {
                             <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
                           </span>
                         )}
+                        <SaveFarmButton farmId={f.id} className="absolute bottom-3 right-3" />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
                         <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>

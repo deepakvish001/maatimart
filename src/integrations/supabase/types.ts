@@ -46,6 +46,27 @@ export type Database = {
           },
         ]
       }
+      farm_wishlists: {
+        Row: {
+          created_at: string
+          farm_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          farm_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          farm_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       farms: {
         Row: {
           created_at: string

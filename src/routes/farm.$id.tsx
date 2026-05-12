@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
 import { resolveImage } from "@/lib/seed-images";
+import { SaveFarmButton } from "@/components/save-farm-button";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -166,6 +167,7 @@ function FarmPage() {
             </div>
             <div className="relative">
               {img && <img src={img} alt={farm.name} className="aspect-square w-full object-cover rounded-2xl shadow-lg" />}
+              <SaveFarmButton farmId={farm.id} className="absolute top-4 right-4 h-11 w-11" />
             </div>
           </div>
         </section>
