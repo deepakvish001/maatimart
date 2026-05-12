@@ -148,9 +148,6 @@ export function getDeliveryEta(opts: {
     serviceable: true,
   };
 }
-    pincode: userPincode,
-  };
-}
 
 export function etaToneClasses(tone: EtaTone): string {
   switch (tone) {
