@@ -69,7 +69,7 @@ function FarmPage() {
       if (!farm) throw notFound();
       const { data: products } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,created_at")
+        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,created_at")
         .eq("farm_id", id)
         .eq("is_active", true);
       const productIds = (products ?? []).map((p) => p.id);
