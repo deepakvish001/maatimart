@@ -103,6 +103,29 @@ function Home() {
     },
   });
 
+  const {
+    data: reviewHighlights,
+    isLoading: reviewsLoading,
+    isError: reviewsError,
+    refetch: refetchReviews,
+  } = useQuery({
+    queryKey: ["home-review-highlights"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("id,user_id,rating,comment,created_at,products(name,farms(name))")
+        .not("comment", "is", null)
+        .gte("rating", 4)
+        .order("rating", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return (data ?? [])
+        .filter((r) => (r.comment ?? "").trim().length >= 12)
+        .slice(0, 3);
+    },
+  });
+
   const popular = (products ?? []).slice(0, 5);
   const dailyBest = (products ?? []).slice(5, 9);
   const deals = (products ?? []).slice(9, 13);
