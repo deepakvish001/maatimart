@@ -1,6 +1,7 @@
-import { Truck, Info } from "lucide-react";
+import { Truck, Info, MapPin } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
+import { PincodePicker } from "@/components/pincode-picker";
 
 const FREE_THRESHOLD_RUPEES = 499;
 const CUTOFF_LABEL = "2 PM";
@@ -22,7 +23,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
       <PopoverContent
         align="start"
         side="top"
-        className="w-64 text-xs"
+        className="w-72 text-xs"
         onClick={(e) => e.preventDefault()}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
@@ -31,12 +32,28 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
             <Truck className="h-3.5 w-3.5 text-primary" /> {eta.label}
           </div>
           <p className="text-muted-foreground">{eta.detail}</p>
+
+          <div className="flex items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              {eta.pincode ? (
+                <span><span className="font-medium text-foreground">{eta.pincode}</span> · {eta.zone === "local" ? "Local zone" : eta.zone === "regional" ? "Regional" : eta.zone === "out-of-zone" ? "Out of zone" : ""}</span>
+              ) : (
+                <span>No pincode set</span>
+              )}
+            </div>
+            <PincodePicker compact />
+          </div>
+
           <div className="border-t border-border/60 pt-2 space-y-1 text-muted-foreground">
             <p>
               <span className="font-medium text-foreground">Same-day cutoff:</span> order before {CUTOFF_LABEL} for delivery today.
             </p>
             <p>
               <span className="font-medium text-foreground">Free express:</span> unlocked when your cart reaches ₹{FREE_THRESHOLD_RUPEES}.
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date — out-of-zone pincodes can't be delivered.
             </p>
           </div>
         </div>
