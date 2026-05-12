@@ -103,6 +103,29 @@ function Home() {
     },
   });
 
+  const {
+    data: reviewHighlights,
+    isLoading: reviewsLoading,
+    isError: reviewsError,
+    refetch: refetchReviews,
+  } = useQuery({
+    queryKey: ["home-review-highlights"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("id,user_id,rating,comment,created_at,products(name,farms(name))")
+        .not("comment", "is", null)
+        .gte("rating", 4)
+        .order("rating", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return (data ?? [])
+        .filter((r) => (r.comment ?? "").trim().length >= 12)
+        .slice(0, 3);
+    },
+  });
+
   const popular = (products ?? []).slice(0, 5);
   const dailyBest = (products ?? []).slice(5, 9);
   const deals = (products ?? []).slice(9, 13);
@@ -439,6 +462,60 @@ function Home() {
               </div>
             )}
           </div>
+        </section>
+
+        {/* REVIEW HIGHLIGHTS */}
+        <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-2">
+                <Quote className="h-3.5 w-3.5" /> What shoppers say
+              </div>
+              <h2 className="font-display text-2xl md:text-3xl font-bold">Loved by our community</h2>
+            </div>
+          </div>
+          {reviewsError ? (
+            <SectionError message="Couldn't load reviews." onRetry={() => refetchReviews()} />
+          ) : reviewsLoading ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border border-border bg-card p-6 h-48 animate-pulse" />
+              ))}
+            </div>
+          ) : (reviewHighlights ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No reviews yet — be the first to share your experience.</p>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {(reviewHighlights ?? []).map((r) => {
+                const initials = (r.user_id ?? "").replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase() || "MM";
+                const product = (r as any).products;
+                const farmName = product?.farms?.name;
+                return (
+                  <article key={r.id} className="relative flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all">
+                    <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/15" />
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary font-bold text-sm">
+                        {initials}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold leading-tight">Verified buyer</div>
+                        <StarRating value={r.rating} count={0} />
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/90 line-clamp-4 mb-4">
+                      &ldquo;{r.comment}&rdquo;
+                    </p>
+                    {product?.name && (
+                      <p className="mt-auto text-xs text-muted-foreground">
+                        on <span className="font-semibold text-foreground">{product.name}</span>
+                        {farmName && <> from <span className="font-semibold text-foreground">{farmName}</span></>}
+                      </p>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* NEWSLETTER BANNER */}
