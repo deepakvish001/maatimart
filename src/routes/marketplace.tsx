@@ -77,7 +77,7 @@ function Marketplace() {
               <Link
                 key={c}
                 from={Route.fullPath}
-                search={(prev) => ({ ...prev, category: c })}
+                search={(prev: MarketplaceSearch) => ({ ...prev, category: c })}
                 className={`px-4 py-2 rounded-full text-xs font-semibold capitalize transition-colors ${category === c ? "bg-primary text-primary-foreground" : "bg-card border border-border hover:bg-primary/5 hover:text-primary"}`}
               >
                 {c}
