@@ -41,13 +41,17 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     fee: (s) => (s >= 99900 || s === 0 ? 0 : 9900),
     eta: (_s, pincode) => {
       const now = new Date();
+      const zone = getDeliveryZone(pincode);
+      const cutoffLabel = formatCutoffLabel(zone.cutoffHour);
       const base = { tone: "express" as const, zone: pincode ? "local" as const : "unknown" as const, serviceable: true, pincode: pincode ?? null };
-      if (now.getHours() < 14) return { ...base, label: "Today by 9 PM", detail: pincode ? `Hand-delivered express to ${pincode}.` : "Hand-delivered express." };
+      if (now.getHours() < zone.cutoffHour) {
+        return { ...base, label: "Today by 9 PM", detail: `Hand-delivered express in ${zone.city} — order before ${cutoffLabel}.` };
+      }
       const t = new Date(now); t.setDate(t.getDate() + 1);
       return {
         ...base,
         label: `Tomorrow · ${t.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })} by 11 AM`,
-        detail: "Priority morning slot.",
+        detail: `Priority morning slot in ${zone.city}.`,
       };
     },
   },
