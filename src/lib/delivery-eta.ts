@@ -14,6 +14,11 @@ export interface DeliveryEta {
   zone: EtaZone;
   serviceable: boolean;
   pincode: string | null;
+  /** Live snapshot of cart total + this addition, used to render progress bars. */
+  cartTotalPaise: number;
+  freeThresholdPaise: number;
+  remainingToFreePaise: number;
+  expressEligible: boolean;
 }
 
 const FREE_THRESHOLD_PAISE = 49900; // ₹499 — matches cart-store / cart page
