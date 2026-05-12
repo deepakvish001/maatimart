@@ -252,7 +252,7 @@ function Home() {
             <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline hidden md:inline">All deals →</Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {deals.map((p) => {
+            {deals.map((p, i) => {
               const img = resolveImage(p.image_url);
               return (
                 <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
