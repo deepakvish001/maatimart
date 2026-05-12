@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Plus, Leaf, Truck } from "lucide-react";
+import { Heart, Plus, Leaf } from "lucide-react";
 import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { useWishlist } from "@/lib/wishlist-store";
 import { StarRating } from "@/components/star-rating";
 import { useCart, cartTotal } from "@/lib/cart-store";
-import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
+import { getDeliveryEta } from "@/lib/delivery-eta";
+import { EtaChip } from "@/components/eta-chip";
 
 export interface ProductCardData {
   id: string;
@@ -90,8 +91,8 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             <div className="mt-2 text-[11px] text-muted-foreground">New listing</div>
           )}
 
-          <div className={`mt-3 inline-flex items-center gap-1.5 self-start rounded-full border px-2 py-0.5 text-[10px] font-semibold ${etaToneClasses(eta.tone)}`}>
-            <Truck className="h-3 w-3" /> {eta.label}
+          <div className="mt-3" onClick={(e) => e.preventDefault()}>
+            <EtaChip eta={eta} />
           </div>
 
           <div className="mt-3 flex items-end justify-between gap-2">
