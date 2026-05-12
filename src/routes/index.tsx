@@ -282,28 +282,36 @@ function Home() {
             </div>
             <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline hidden md:inline">All deals →</Link>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {deals.map((p, i) => {
-              const img = resolveImage(p.image_url);
-              return (
-                <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
-                    {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                    <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
-                    {p.farm && <p className="text-xs text-muted-foreground mt-1 truncate">{p.farm.name} · {p.farm.region}</p>}
-                    <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="font-display text-xl font-bold text-primary">{formatINR(p.price_paise)}</span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">+ Add</span>
+          {productsError ? (
+            <SectionError message="Couldn't load today's deals." onRetry={() => refetchProducts()} />
+          ) : productsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => <DealCardSkeleton key={i} />)}
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {deals.map((p, i) => {
+                const img = resolveImage(p.image_url);
+                return (
+                  <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
+                      {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                      <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                    <div className="p-5">
+                      <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
+                      {p.farm && <p className="text-xs text-muted-foreground mt-1 truncate">{p.farm.name} · {p.farm.region}</p>}
+                      <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="font-display text-xl font-bold text-primary">{formatINR(p.price_paise)}</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">+ Add</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* TABBED LISTS */}
