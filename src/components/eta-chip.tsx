@@ -4,17 +4,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
 import { PincodePicker } from "@/components/pincode-picker";
 
-const CUTOFF_HOUR = 14; // 2 PM local
-const CUTOFF_LABEL = "2 PM";
-
-function nextCutoff(now: Date): Date {
+function nextCutoff(now: Date, cutoffHour: number): Date {
   const c = new Date(now);
-  c.setHours(CUTOFF_HOUR, 0, 0, 0);
+  c.setHours(cutoffHour, 0, 0, 0);
   if (now.getTime() >= c.getTime()) c.setDate(c.getDate() + 1);
   return c;
 }
 
-function useCutoffCountdown(active: boolean) {
+function useCutoffCountdown(active: boolean, cutoffHour: number) {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
     if (!active) return;
@@ -23,7 +20,7 @@ function useCutoffCountdown(active: boolean) {
     return () => clearInterval(id);
   }, [active]);
   if (!now) return null;
-  const target = nextCutoff(now);
+  const target = nextCutoff(now, cutoffHour);
   const diffMs = target.getTime() - now.getTime();
   const totalSec = Math.max(0, Math.floor(diffMs / 1000));
   const h = Math.floor(totalSec / 3600);
@@ -43,7 +40,8 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
   const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
   const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
   const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
-  const countdown = useCutoffCountdown(open);
+  const countdown = useCutoffCountdown(open, eta.cutoffHour);
+  const cutoffLabel = eta.cutoffLabel;
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
