@@ -115,7 +115,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
                   {countdown.isToday ? (
                     <>Order in <span className="font-semibold text-foreground">{countdown.label}</span> for same-day delivery</>
                   ) : (
-                    <>Same-day cutoff in <span className="font-semibold text-foreground">{countdown.label}</span> (tomorrow {CUTOFF_LABEL})</>
+                    <>Same-day cutoff in <span className="font-semibold text-foreground">{countdown.label}</span> (tomorrow {cutoffLabel})</>
                   )}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
 
           <div className="border-t border-border/60 pt-2 space-y-1 text-muted-foreground">
             <p>
-              <span className="font-medium text-foreground">Same-day cutoff:</span> order before {CUTOFF_LABEL} for delivery today.
+              <span className="font-medium text-foreground">Same-day cutoff:</span> order before {cutoffLabel} for delivery today.
             </p>
             <p>
               <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date — out-of-zone pincodes can't be delivered.
