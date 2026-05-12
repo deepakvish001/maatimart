@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Truck, Info, MapPin, Sparkles, Timer } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
@@ -30,6 +30,7 @@ function useCutoffCountdown(active: boolean, cutoffHour: number) {
   const isToday = target.toDateString() === now.toDateString();
   return {
     label: `${pad(h)}:${pad(m)}:${pad(s)}`,
+    spoken: `${h > 0 ? `${h} hour${h === 1 ? "" : "s"} ` : ""}${m} minute${m === 1 ? "" : "s"}`,
     isToday,
     targetDate: target,
   };
@@ -37,8 +38,11 @@ function useCutoffCountdown(active: boolean, cutoffHour: number) {
 
 export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?: string }) {
   const [open, setOpen] = useState(false);
+  const titleId = useId();
+  const descId = useId();
   const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
   const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
+  const cartRupees = Math.round(eta.cartTotalPaise / 100);
   const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
   const countdown = useCutoffCountdown(open, eta.cutoffHour);
   const cutoffLabel = eta.cutoffLabel;
@@ -47,30 +51,31 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
       <PopoverTrigger asChild>
         <button
           type="button"
-          onClick={(e) => e.preventDefault()}
-          aria-label={`Delivery estimate: ${eta.label}. Tap for details.`}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-primary/40 ${etaToneClasses(eta.tone)} ${className}`}
+          aria-label={`Delivery estimate: ${eta.label}. Press Enter for details.`}
+          aria-haspopup="dialog"
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-1 ${etaToneClasses(eta.tone)} ${className}`}
         >
-          <Truck className="h-3 w-3" /> {eta.label}
-          <Info className="h-2.5 w-2.5 opacity-60" />
+          <Truck className="h-3 w-3" aria-hidden="true" /> {eta.label}
+          <Info className="h-2.5 w-2.5 opacity-60" aria-hidden="true" />
         </button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
         side="top"
         className="w-72 text-xs"
-        onClick={(e) => e.preventDefault()}
-        onOpenAutoFocus={(e) => e.preventDefault()}
+        role="dialog"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
       >
         <div className="space-y-2">
-          <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <Truck className="h-3.5 w-3.5 text-primary" /> {eta.label}
-          </div>
-          <p className="text-muted-foreground">{eta.detail}</p>
+          <h3 id={titleId} className="flex items-center gap-1.5 font-semibold text-foreground">
+            <Truck className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> {eta.label}
+          </h3>
+          <p id={descId} className="text-muted-foreground">{eta.detail}</p>
 
           <div className="flex items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1.5">
             <div className="flex items-center gap-1.5 text-muted-foreground">
-              <MapPin className="h-3 w-3" />
+              <MapPin className="h-3 w-3" aria-hidden="true" />
               {eta.pincode ? (
                 <span><span className="font-medium text-foreground">{eta.pincode}</span> · {eta.zone === "local" ? "Local zone" : eta.zone === "regional" ? "Regional" : eta.zone === "out-of-zone" ? "Out of zone" : ""}</span>
               ) : (
@@ -84,7 +89,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
           <div className="rounded-md border border-border/60 bg-card px-2.5 py-2">
             {eta.expressEligible ? (
               <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-                <Sparkles className="h-3 w-3" /> Free express unlocked!
+                <Sparkles className="h-3 w-3" aria-hidden="true" /> Free express unlocked!
               </div>
             ) : (
               <>
@@ -92,14 +97,21 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
                   <span>Add ₹{remainingRupees} more</span>
                   <span className="text-muted-foreground font-normal">for free express</span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-valuenow={progressPct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Free express progress: ₹${cartRupees} of ₹${thresholdRupees}`}
+                >
                   <div
                     className="h-full rounded-full bg-primary transition-[width] duration-300"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
                 <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
-                  <span>₹{Math.round(eta.cartTotalPaise / 100)} in cart</span>
+                  <span>₹{cartRupees} in cart</span>
                   <span>₹{thresholdRupees} threshold</span>
                 </div>
               </>
@@ -108,14 +120,20 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
 
           {/* Live cutoff countdown */}
           {countdown && (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-card px-2.5 py-2">
+            <div
+              className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-card px-2.5 py-2"
+              role="timer"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-label={`${countdown.spoken} until ${countdown.isToday ? "today's" : "tomorrow's"} ${cutoffLabel} cutoff`}
+            >
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Timer className="h-3 w-3" />
+                <Timer className="h-3 w-3" aria-hidden="true" />
                 <span>
                   {countdown.isToday ? (
-                    <>Order in <span className="font-semibold text-foreground">{countdown.label}</span> for same-day delivery</>
+                    <>Order in <span className="font-semibold text-foreground" aria-hidden="true">{countdown.label}</span> for same-day delivery</>
                   ) : (
-                    <>Same-day cutoff in <span className="font-semibold text-foreground">{countdown.label}</span> (tomorrow {cutoffLabel})</>
+                    <>Same-day cutoff in <span className="font-semibold text-foreground" aria-hidden="true">{countdown.label}</span> (tomorrow {cutoffLabel})</>
                   )}
                 </span>
               </div>
@@ -129,6 +147,7 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
             <p>
               <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date — out-of-zone pincodes can't be delivered.
             </p>
+            <p className="text-[10px] opacity-70">Press Esc to close.</p>
           </div>
         </div>
       </PopoverContent>
