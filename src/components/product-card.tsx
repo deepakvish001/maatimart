@@ -25,6 +25,12 @@ export function ProductCard({ p }: { p: ProductCardData }) {
   const { has, toggle, ready } = useWishlist();
   const navigate = useNavigate();
   const saved = has(p.id);
+  const items = useCart((s) => s.items);
+  const eta = getDeliveryEta({
+    stock: p.stock,
+    cartTotalPaise: cartTotal(items),
+    addingPaise: p.price_paise,
+  });
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
