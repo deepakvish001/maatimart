@@ -75,7 +75,7 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,created_at,farms(name,region)")
+        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,created_at,farms(name,region)")
         .eq("is_active", true)
         .limit(24);
       if (error) throw error;

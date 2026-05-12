@@ -2,16 +2,17 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Truck, ShieldCheck, Sprout, Minus, Plus, ShoppingBag, ArrowRight, MapPin } from "lucide-react";
+import { Leaf, Truck, ShieldCheck, Sprout, Minus, Plus, ShoppingBag, ArrowRight, MapPin, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
-import { useCart } from "@/lib/cart-store";
+import { useCart, cartTotal } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { ProductReviews } from "@/components/product-reviews";
+import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/product/$id")({
 function ProductPage() {
   const { id } = Route.useParams();
   const add = useCart((s) => s.add);
+  const items = useCart((s) => s.items);
   const [qty, setQty] = useState(1);
 
   const { data: p, isLoading } = useQuery({
@@ -39,6 +41,11 @@ function ProductPage() {
   const farmImg = p?.farms?.image_url ? resolveImage(p.farms.image_url) : null;
   const productImg = p ? resolveImage(p.image_url) : null;
   const inStock = (p?.stock ?? 0) > 0;
+  const eta = getDeliveryEta({
+    stock: p?.stock,
+    cartTotalPaise: cartTotal(items),
+    addingPaise: (p?.price_paise ?? 0) * qty,
+  });
 
   const benefits = [
     { icon: Sprout, title: "Farm-fresh", desc: "Harvested to order" },
@@ -115,6 +122,15 @@ function ProductPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Delivery ETA */}
+                  <div className={`mb-4 flex items-start gap-3 rounded-2xl border p-3 ${etaToneClasses(eta.tone)}`}>
+                    <span className="rounded-xl bg-background/60 p-2 mt-0.5"><Clock size={16} /></span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold leading-tight">Delivery {eta.label}</p>
+                      <p className="text-[11px] opacity-80 leading-tight mt-0.5">{eta.detail}</p>
+                    </div>
                   </div>
 
                   {/* Quantity + CTA */}
