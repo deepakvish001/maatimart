@@ -157,6 +157,7 @@ function Home() {
               <Link
                 key={c.label}
                 to="/marketplace"
+                search={{ category: c.category, organic: !!c.organic, q: "" }}
                 className={`group flex flex-col items-center justify-center rounded-2xl border border-border ${c.tint} p-3 aspect-square hover:border-primary/40 hover:-translate-y-0.5 transition-all text-center`}
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-background/70 mb-2">
