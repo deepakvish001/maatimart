@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Plus, Leaf } from "lucide-react";
+import { Heart, Plus, Leaf, Truck } from "lucide-react";
 import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { useWishlist } from "@/lib/wishlist-store";
 import { StarRating } from "@/components/star-rating";
+import { useCart, cartTotal } from "@/lib/cart-store";
+import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
 
 export interface ProductCardData {
   id: string;
@@ -12,6 +14,7 @@ export interface ProductCardData {
   price_paise: number;
   image_url: string | null;
   is_organic: boolean;
+  stock?: number | null;
   rating_avg?: number;
   rating_count?: number;
   farm?: { name: string; region: string } | null;
