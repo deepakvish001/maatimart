@@ -5,11 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { getDeliveryEta } from "@/lib/delivery-eta";
+import { useCart, cartTotal } from "@/lib/cart-store";
 
 const CATEGORIES = ["all", "vegetables", "fruits", "spices"] as const;
 type Category = (typeof CATEGORIES)[number];
 
-const SORTS = ["newest", "price-asc", "price-desc", "rating"] as const;
+const SORTS = ["newest", "price-asc", "price-desc", "rating", "fastest"] as const;
 type Sort = (typeof SORTS)[number];
 
 const SORT_LABEL: Record<Sort, string> = {
@@ -17,7 +19,10 @@ const SORT_LABEL: Record<Sort, string> = {
   "price-asc": "Price · low to high",
   "price-desc": "Price · high to low",
   rating: "Top rated",
+  fastest: "Fastest delivery",
 };
+
+const TONE_RANK = { express: 0, standard: 1, slow: 2 } as const;
 
 const CAT_ICON: Record<Category, typeof Sprout> = {
   all: Sparkles,
@@ -58,6 +63,9 @@ function Marketplace() {
   const setSearch = (patch: Partial<MarketplaceSearch>) =>
     navigate({ search: (prev: MarketplaceSearch) => ({ ...prev, ...patch }) });
 
+  const cartItems = useCart((s) => s.items);
+  const cartSubtotal = cartTotal(cartItems);
+
   const { data, isLoading } = useQuery({
     queryKey: ["products", category, organic, q, sort],
     queryFn: async () => {
@@ -72,6 +80,7 @@ function Marketplace() {
         case "price-asc": query = query.order("price_paise", { ascending: true }); break;
         case "price-desc": query = query.order("price_paise", { ascending: false }); break;
         case "rating": query = query.order("rating_avg", { ascending: false }); break;
+        case "fastest": query = query.order("stock", { ascending: false, nullsFirst: false }); break;
         default: query = query.order("created_at", { ascending: false });
       }
       const { data, error } = await query;
@@ -80,7 +89,22 @@ function Marketplace() {
     },
   });
 
-  const count = data?.length ?? 0;
+  const sortedData = (() => {
+    if (!data || sort !== "fastest") return data;
+    return [...data]
+      .map((p) => ({
+        p,
+        rank: TONE_RANK[getDeliveryEta({
+          stock: p.stock,
+          cartTotalPaise: cartSubtotal,
+          addingPaise: p.price_paise,
+        }).tone],
+      }))
+      .sort((a, b) => a.rank - b.rank)
+      .map((x) => x.p);
+  })();
+
+  const count = sortedData?.length ?? 0;
   const hasFilters = category !== "all" || organic || q !== "" || sort !== "newest";
 
   return (
@@ -224,7 +248,7 @@ function Marketplace() {
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {data!.map((p) => (
+              {sortedData!.map((p) => (
                 <div key={p.id} className="rounded-3xl bg-card border border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden">
                   <ProductCard p={p} />
                 </div>
