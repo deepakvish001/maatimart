@@ -15,6 +15,7 @@ import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
+import { VisitFarmLink } from "@/components/visit-farm-link";
 import {
   ProductGridSkeleton,
   DealCardSkeleton,
@@ -424,13 +425,13 @@ function Home() {
                           {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
-                        <Link
-                          to="/farm/$id"
-                          params={{ id: f.id }}
+                        <VisitFarmLink
+                          farmId={f.id}
+                          source="homepage"
                           className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
                         >
                           Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                        </Link>
+                        </VisitFarmLink>
                       </div>
                     </article>
                   );
