@@ -38,12 +38,47 @@ function Home() {
       return (data ?? []).map((p) => ({ ...p, farm: p.farms }));
     },
   });
+  const { data: deals } = useQuery({
+    queryKey: ["todays-deals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,farms(name,region)")
+        .eq("is_active", true)
+        .order("price_paise", { ascending: true })
+        .limit(4);
+      if (error) throw error;
+      return (data ?? []).map((p) => ({ ...p, farm: p.farms }));
+    },
+  });
+  const { data: arrivals } = useQuery({
+    queryKey: ["fresh-arrivals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,farms(name,region)")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return (data ?? []).map((p) => ({ ...p, farm: p.farms }));
+    },
+  });
   const { data: farms } = useQuery({
     queryKey: ["featured-farms"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("farms").select("id,name,region,story,image_url").limit(3);
+      const { data, error } = await supabase
+        .from("farms")
+        .select("id,name,region,story,image_url,products(rating_avg,rating_count)")
+        .limit(3);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((f) => {
+        const rated = (f.products ?? []).filter((p: { rating_count: number }) => p.rating_count > 0);
+        const avg = rated.length
+          ? rated.reduce((s: number, p: { rating_avg: number }) => s + (p.rating_avg ?? 0), 0) / rated.length
+          : 0;
+        return { ...f, productCount: f.products?.length ?? 0, avgRating: avg };
+      });
     },
   });
 
