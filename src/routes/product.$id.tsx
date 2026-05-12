@@ -124,6 +124,15 @@ function ProductPage() {
                     ))}
                   </div>
 
+                  {/* Delivery ETA */}
+                  <div className={`mb-4 flex items-start gap-3 rounded-2xl border p-3 ${etaToneClasses(eta.tone)}`}>
+                    <span className="rounded-xl bg-background/60 p-2 mt-0.5"><Clock size={16} /></span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold leading-tight">Delivery {eta.label}</p>
+                      <p className="text-[11px] opacity-80 leading-tight mt-0.5">{eta.detail}</p>
+                    </div>
+                  </div>
+
                   {/* Quantity + CTA */}
                   <div className="flex flex-col sm:flex-row items-stretch gap-3">
                     <div className="inline-flex items-center justify-between rounded-xl bg-muted/60 p-1">
