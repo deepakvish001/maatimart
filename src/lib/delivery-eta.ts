@@ -1,13 +1,19 @@
 // Lightweight delivery ETA estimator used by product cards and the
 // product detail page. Pure function so it stays SSR-safe; the caller
-// passes in the current cart total and (optionally) what they're about
-// to add.
+// passes in the current cart total, what they're about to add, and
+// optionally the user's delivery pincode + the farm's serviceable
+// pincode list.
 
 export type EtaTone = "express" | "standard" | "slow";
+export type EtaZone = "local" | "regional" | "out-of-zone" | "unknown";
+
 export interface DeliveryEta {
   label: string;
   tone: EtaTone;
   detail: string;
+  zone: EtaZone;
+  serviceable: boolean;
+  pincode: string | null;
 }
 
 const FREE_THRESHOLD_PAISE = 49900; // ₹499 — matches cart-store / cart page
@@ -18,19 +24,48 @@ function fmt(date: Date): string {
   return date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
 }
 
+function classifyZone(userPin: string | null | undefined, farmPins: string[] | null | undefined): EtaZone {
+  if (!userPin) return "unknown";
+  if (!farmPins || farmPins.length === 0) return "unknown";
+  if (farmPins.includes(userPin)) return "local";
+  const prefix = userPin.slice(0, 3);
+  if (farmPins.some((p) => p.startsWith(prefix))) return "regional";
+  return "out-of-zone";
+}
+
 export function getDeliveryEta(opts: {
   stock?: number | null;
   cartTotalPaise?: number;
   addingPaise?: number;
   freeThresholdPaise?: number;
   now?: Date;
+  userPincode?: string | null;
+  farmPincodes?: string[] | null;
 }): DeliveryEta {
   const stock = opts.stock ?? 1;
+  const userPincode = opts.userPincode ?? null;
+  const zone = classifyZone(userPincode, opts.farmPincodes);
+
   if (stock <= 0) {
     return {
       label: `Restocking · ${RESTOCK_DAYS}`,
       tone: "slow",
       detail: "We'll harvest a fresh batch and ship as soon as it's ready.",
+      zone,
+      serviceable: zone !== "out-of-zone",
+      pincode: userPincode,
+    };
+  }
+
+  // Out-of-zone: farm doesn't ship to this pincode.
+  if (zone === "out-of-zone") {
+    return {
+      label: `Not deliverable to ${userPincode}`,
+      tone: "slow",
+      detail: "This farm doesn't ship to your pincode yet. Try another product or update your delivery pincode.",
+      zone,
+      serviceable: false,
+      pincode: userPincode,
     };
   }
 
@@ -39,11 +74,35 @@ export function getDeliveryEta(opts: {
   const now = opts.now ?? new Date();
   const expressEligible = total >= free;
 
+  // Regional zone (same district prefix but not exact match) — never same-day,
+  // add a buffer day.
+  if (zone === "regional") {
+    const target = new Date(now);
+    const offset = expressEligible ? 1 : (now.getHours() < SAME_DAY_CUTOFF_HOUR ? 2 : 3);
+    target.setDate(target.getDate() + offset);
+    return {
+      label: `By ${fmt(target)}`,
+      tone: expressEligible ? "standard" : "slow",
+      detail: expressEligible
+        ? `Regional delivery to ${userPincode} · free express applied.`
+        : `Regional delivery to ${userPincode}. Add more for free express.`,
+      zone,
+      serviceable: true,
+      pincode: userPincode,
+    };
+  }
+
+  // Local zone or unknown (no pincode set) — original logic.
   if (expressEligible && now.getHours() < SAME_DAY_CUTOFF_HOUR) {
     return {
       label: "Today by 9 PM",
       tone: "express",
-      detail: "Free express delivery — order before 2 PM.",
+      detail: zone === "local"
+        ? `Free express to ${userPincode} — order before 2 PM.`
+        : "Free express delivery — order before 2 PM. Set your pincode for an exact ETA.",
+      zone,
+      serviceable: true,
+      pincode: userPincode,
     };
   }
 
@@ -54,7 +113,12 @@ export function getDeliveryEta(opts: {
     return {
       label: `Tomorrow · ${fmt(tomorrow)}`,
       tone: "express",
-      detail: "Free express delivery on your cart.",
+      detail: zone === "local"
+        ? `Free express delivery to ${userPincode}.`
+        : "Free express delivery on your cart. Set your pincode for an exact ETA.",
+      zone,
+      serviceable: true,
+      pincode: userPincode,
     };
   }
 
@@ -63,12 +127,18 @@ export function getDeliveryEta(opts: {
   const offset = now.getHours() < SAME_DAY_CUTOFF_HOUR ? 1 : 2;
   target.setDate(target.getDate() + offset);
   const remaining = Math.max(0, free - total);
+  const baseDetail = remaining > 0
+    ? `Add ₹${(remaining / 100).toFixed(0)} more for free express delivery.`
+    : "Standard delivery";
   return {
     label: `By ${fmt(target)}`,
     tone: "standard",
-    detail: remaining > 0
-      ? `Add ₹${(remaining / 100).toFixed(0)} more for free express delivery.`
-      : "Standard delivery",
+    detail: zone === "local"
+      ? `${baseDetail} · ships to ${userPincode}.`
+      : `${baseDetail}${zone === "unknown" ? " Set your pincode for an exact ETA." : ""}`,
+    zone,
+    serviceable: true,
+    pincode: userPincode,
   };
 }
 

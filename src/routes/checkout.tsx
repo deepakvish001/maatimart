@@ -11,6 +11,7 @@ import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { getDeliveryEta, etaToneClasses, type EtaTone } from "@/lib/delivery-eta";
+import { usePincode } from "@/lib/pincode-store";
 
 type ShippingId = "standard" | "express" | "scheduled";
 
@@ -20,7 +21,7 @@ interface ShippingOption {
   blurb: string;
   icon: typeof Truck;
   fee: (subtotalPaise: number) => number;
-  eta: (subtotalPaise: number) => { label: string; tone: EtaTone; detail: string };
+  eta: (subtotalPaise: number, pincode: string | null) => { label: string; tone: EtaTone; detail: string; zone?: string; serviceable?: boolean; pincode?: string | null };
 }
 
 const SHIPPING_OPTIONS: ShippingOption[] = [
@@ -30,7 +31,7 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     blurb: "Free over ₹499 · 1–2 days",
     icon: Truck,
     fee: (s) => (s >= 49900 || s === 0 ? 0 : 4900),
-    eta: (s) => getDeliveryEta({ stock: 1, cartTotalPaise: s }),
+    eta: (s, pincode) => getDeliveryEta({ stock: 1, cartTotalPaise: s, userPincode: pincode }),
   },
   {
     id: "express",
@@ -38,13 +39,14 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     blurb: "Today / tomorrow morning · ₹99 (free over ₹999)",
     icon: Zap,
     fee: (s) => (s >= 99900 || s === 0 ? 0 : 9900),
-    eta: () => {
+    eta: (_s, pincode) => {
       const now = new Date();
-      if (now.getHours() < 14) return { label: "Today by 9 PM", tone: "express", detail: "Hand-delivered express." };
+      const base = { tone: "express" as const, zone: pincode ? "local" as const : "unknown" as const, serviceable: true, pincode: pincode ?? null };
+      if (now.getHours() < 14) return { ...base, label: "Today by 9 PM", detail: pincode ? `Hand-delivered express to ${pincode}.` : "Hand-delivered express." };
       const t = new Date(now); t.setDate(t.getDate() + 1);
       return {
+        ...base,
         label: `Tomorrow · ${t.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })} by 11 AM`,
-        tone: "express",
         detail: "Priority morning slot.",
       };
     },
@@ -55,12 +57,15 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     blurb: "Free · pick any day this week",
     icon: Leaf,
     fee: () => 0,
-    eta: () => {
+    eta: (_s, pincode) => {
       const t = new Date(); t.setDate(t.getDate() + 3);
       return {
         label: `In 3 days · ${t.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}`,
         tone: "standard",
         detail: "Combined with other deliveries to your area — lower carbon, free shipping.",
+        zone: pincode ? "local" : "unknown",
+        serviceable: true,
+        pincode: pincode ?? null,
       };
     },
   },
@@ -77,11 +82,12 @@ function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [shippingId, setShippingId] = useState<ShippingId>("standard");
   const [submitting, setSubmitting] = useState(false);
+  const { pincode } = usePincode();
 
   const shipping = SHIPPING_OPTIONS.find((o) => o.id === shippingId)!;
   const deliveryFee = useMemo(() => shipping.fee(subtotal), [shipping, subtotal]);
   const total = subtotal + deliveryFee;
-  const eta = useMemo(() => shipping.eta(subtotal), [shipping, subtotal]);
+  const eta = useMemo(() => shipping.eta(subtotal, pincode), [shipping, subtotal, pincode]);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login", search: { redirect: "/checkout" } });

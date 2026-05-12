@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { getDeliveryEta } from "@/lib/delivery-eta";
 import { useCart, cartTotal } from "@/lib/cart-store";
+import { usePincode } from "@/lib/pincode-store";
 
 const CATEGORIES = ["all", "vegetables", "fruits", "spices"] as const;
 type Category = (typeof CATEGORIES)[number];
@@ -65,13 +66,14 @@ function Marketplace() {
 
   const cartItems = useCart((s) => s.items);
   const cartSubtotal = cartTotal(cartItems);
+  const { pincode } = usePincode();
 
   const { data, isLoading } = useQuery({
     queryKey: ["products", category, organic, q, sort],
     queryFn: async () => {
       let query = supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,farms(name,region)")
+        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,farms(name,region,delivery_pincodes)")
         .eq("is_active", true);
       if (category !== "all") query = query.eq("category", category);
       if (organic) query = query.eq("is_organic", true);
@@ -98,6 +100,8 @@ function Marketplace() {
           stock: p.stock,
           cartTotalPaise: cartSubtotal,
           addingPaise: p.price_paise,
+          userPincode: pincode,
+          farmPincodes: p.farm?.delivery_pincodes ?? null,
         }).tone],
       }))
       .sort((a, b) => a.rank - b.rank)

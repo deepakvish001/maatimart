@@ -7,6 +7,7 @@ import { StarRating } from "@/components/star-rating";
 import { useCart, cartTotal } from "@/lib/cart-store";
 import { getDeliveryEta } from "@/lib/delivery-eta";
 import { EtaChip } from "@/components/eta-chip";
+import { usePincode } from "@/lib/pincode-store";
 
 export interface ProductCardData {
   id: string;
@@ -18,7 +19,7 @@ export interface ProductCardData {
   stock?: number | null;
   rating_avg?: number;
   rating_count?: number;
-  farm?: { name: string; region: string } | null;
+  farm?: { name: string; region: string; delivery_pincodes?: string[] | null } | null;
 }
 
 export function ProductCard({ p }: { p: ProductCardData }) {
@@ -27,10 +28,13 @@ export function ProductCard({ p }: { p: ProductCardData }) {
   const navigate = useNavigate();
   const saved = has(p.id);
   const items = useCart((s) => s.items);
+  const { pincode } = usePincode();
   const eta = getDeliveryEta({
     stock: p.stock,
     cartTotalPaise: cartTotal(items),
     addingPaise: p.price_paise,
+    userPincode: pincode,
+    farmPincodes: p.farm?.delivery_pincodes ?? null,
   });
 
   const handleAdd = (e: React.MouseEvent) => {
