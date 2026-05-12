@@ -250,7 +250,7 @@ function CheckoutPage() {
               </ul>
               <dl className="space-y-2 text-sm border-t border-border pt-4">
                 <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{formatINR(subtotal)}</dd></div>
-                <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{deliveryFee === 0 ? <span className="text-primary font-medium">Free</span> : formatINR(deliveryFee)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Delivery · {shipping.name}</dt><dd>{deliveryFee === 0 ? <span className="text-primary font-medium">Free</span> : formatINR(deliveryFee)}</dd></div>
               </dl>
               <div className="mt-4 pt-4 border-t border-border flex items-end justify-between">
                 <span className="font-semibold">Total</span>
