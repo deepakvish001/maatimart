@@ -5,6 +5,7 @@ import { useCart, cartCount } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { PincodePicker } from "@/components/pincode-picker";
 
 const NAV = [
   { to: "/" as const, label: "Home" },
