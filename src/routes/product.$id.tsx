@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { ProductReviews } from "@/components/product-reviews";
 import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
+import { usePincode } from "@/lib/pincode-store";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
