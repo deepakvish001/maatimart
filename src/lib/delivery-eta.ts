@@ -122,8 +122,8 @@ export function getDeliveryEta(opts: {
       label: "Today by 9 PM",
       tone: "express",
       detail: zone === "local"
-        ? `Free express to ${userPincode} — order before 2 PM.`
-        : "Free express delivery — order before 2 PM. Set your pincode for an exact ETA.",
+        ? `Free express to ${userPincode} — order before ${cutoffLabel}.`
+        : `Free express delivery — order before ${cutoffLabel}. Set your pincode for an exact ETA.`,
       serviceable: true,
     };
   }
