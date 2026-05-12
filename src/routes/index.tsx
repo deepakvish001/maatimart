@@ -15,6 +15,7 @@ import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
+import { VisitFarmLink } from "@/components/visit-farm-link";
 import {
   ProductGridSkeleton,
   DealCardSkeleton,
