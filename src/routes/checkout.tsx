@@ -176,6 +176,46 @@ function CheckoutPage() {
             </section>
 
             <section className="rounded-3xl border border-border bg-background p-6 md:p-8 shadow-sm">
+              <div className="flex items-baseline justify-between mb-5">
+                <h2 className="font-display text-xl font-bold">Shipping option</h2>
+                <span className="text-xs text-muted-foreground">Updates ETA & fee live</span>
+              </div>
+              <div className="space-y-3">
+                {SHIPPING_OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  const fee = opt.fee(subtotal);
+                  const active = opt.id === shippingId;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setShippingId(opt.id)}
+                      className={`w-full text-left rounded-2xl border-2 p-4 flex items-start gap-3 transition-colors ${
+                        active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <span className={`grid h-10 w-10 place-items-center rounded-xl shrink-0 ${active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground/70"}`}>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold">{opt.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{opt.blurb}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-semibold">{fee === 0 ? <span className="text-primary">Free</span> : formatINR(fee)}</p>
+                        {active && (
+                          <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                            <Check className="h-3 w-3" /> Selected
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-border bg-background p-6 md:p-8 shadow-sm">
               <h2 className="font-display text-xl font-bold mb-5">Payment</h2>
               <div className="rounded-2xl border-2 border-primary bg-primary/5 p-4 flex items-start gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground"><Banknote className="h-5 w-5" /></span>
