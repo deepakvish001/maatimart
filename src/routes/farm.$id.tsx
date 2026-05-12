@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
 import { resolveImage } from "@/lib/seed-images";
+import { SaveFarmButton } from "@/components/save-farm-button";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
