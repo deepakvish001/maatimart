@@ -197,8 +197,15 @@ function Home() {
               <p className="text-sm text-muted-foreground mt-1">Most loved by our customers</p>
             </div>
             <div className="hidden md:flex gap-1.5 text-xs">
-              {["All","Vegetables","Fruits","Spices","Organic"].map((t, i) => (
-                <Link key={t} to="/marketplace" className={`px-3 py-1.5 rounded-full font-semibold ${i === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary"}`}>{t}</Link>
+              {POPULAR_TABS.map((t, i) => (
+                <Link
+                  key={t.label}
+                  to="/marketplace"
+                  search={{ category: t.category, organic: !!t.organic, q: "" }}
+                  className={`px-3 py-1.5 rounded-full font-semibold ${i === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary"}`}
+                >
+                  {t.label}
+                </Link>
               ))}
             </div>
           </div>
