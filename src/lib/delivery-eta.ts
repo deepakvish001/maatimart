@@ -102,7 +102,7 @@ export function getDeliveryEta(opts: {
   // add a buffer day.
   if (zone === "regional") {
     const target = new Date(now);
-    const offset = expressEligible ? 1 : (now.getHours() < SAME_DAY_CUTOFF_HOUR ? 2 : 3);
+    const offset = expressEligible ? 1 : (now.getHours() < cutoffHour ? 2 : 3);
     target.setDate(target.getDate() + offset);
     return {
       ...base,
@@ -116,7 +116,7 @@ export function getDeliveryEta(opts: {
   }
 
   // Local zone or unknown (no pincode set) — original logic.
-  if (expressEligible && now.getHours() < SAME_DAY_CUTOFF_HOUR) {
+  if (expressEligible && now.getHours() < cutoffHour) {
     return {
       ...base,
       label: "Today by 9 PM",
@@ -145,7 +145,7 @@ export function getDeliveryEta(opts: {
 
   // Standard: next-day if before cutoff, else day-after.
   const target = new Date(now);
-  const offset = now.getHours() < SAME_DAY_CUTOFF_HOUR ? 1 : 2;
+  const offset = now.getHours() < cutoffHour ? 1 : 2;
   target.setDate(target.getDate() + offset);
   const baseDetail = remaining > 0
     ? `Add ₹${(remaining / 100).toFixed(0)} more for free express delivery.`
