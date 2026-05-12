@@ -126,6 +126,22 @@ function CheckoutPage() {
           <p className="mt-2 text-muted-foreground">Tell us where to deliver — we'll handle the rest.</p>
         </div>
 
+        {/* Live ETA banner — recalculates with cart total + shipping option */}
+        <div className={`mb-6 rounded-3xl border p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 ${etaToneClasses(eta.tone)}`}>
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-background/70 shrink-0">
+            <Clock className="h-5 w-5" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="font-mono text-[10px] uppercase tracking-widest opacity-70">Estimated arrival · {shipping.name}</p>
+            <p className="font-display text-xl md:text-2xl font-bold leading-tight mt-0.5">{eta.label}</p>
+            <p className="text-sm opacity-80 mt-0.5">{eta.detail}</p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="font-mono text-[10px] uppercase tracking-widest opacity-70">Shipping fee</p>
+            <p className="font-display text-xl font-bold">{deliveryFee === 0 ? "Free" : formatINR(deliveryFee)}</p>
+          </div>
+        </div>
+
         <div className="grid lg:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
           <div className="space-y-6">
             <section className="rounded-3xl border border-border bg-background p-6 md:p-8 shadow-sm">
