@@ -154,6 +154,25 @@ function Home() {
     [deals]
   );
 
+  const farmRegions = useMemo(
+    () => Array.from(new Set((farms ?? []).map((f) => f.region).filter(Boolean))).sort(),
+    [farms]
+  );
+  const farmCategories = useMemo(
+    () => Array.from(new Set((farms ?? []).flatMap((f) => f.categories ?? []))).sort(),
+    [farms]
+  );
+  const filteredFarms = useMemo(() => {
+    const q = farmQuery.trim().toLowerCase();
+    return (farms ?? []).filter((f) => {
+      if (q && !f.name.toLowerCase().includes(q) && !(f.region ?? "").toLowerCase().includes(q)) return false;
+      if (farmRegion !== "all" && f.region !== farmRegion) return false;
+      if (farmMinRating > 0 && f.avgRating < farmMinRating) return false;
+      if (farmCategory !== "all" && !(f.categories ?? []).includes(farmCategory)) return false;
+      return true;
+    });
+  }, [farms, farmQuery, farmRegion, farmMinRating, farmCategory]);
+  const farmFiltersActive = farmQuery.trim() !== "" || farmRegion !== "all" || farmMinRating > 0 || farmCategory !== "all";
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
