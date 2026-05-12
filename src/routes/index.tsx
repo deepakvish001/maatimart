@@ -316,32 +316,40 @@ function Home() {
 
         {/* TABBED LISTS */}
         <section className="px-4 md:px-6 mx-auto max-w-7xl">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tabSections.map((sec) => (
-              <div key={sec.key}>
-                <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">{sec.label}</h3>
-                <ul className="space-y-4">
-                  {sec.items.map((p) => {
-                    const img = resolveImage(p.image_url);
-                    return (
-                      <li key={p.id}>
-                        <Link to="/product/$id" params={{ id: p.id }} className="flex gap-3 group">
-                          <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border">
-                            {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</div>
-                            <div className="mt-1"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
-                            <div className="mt-1 text-sm font-bold text-primary">{formatINR(p.price_paise)}</div>
-                          </div>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => <TabListSkeleton key={i} />)}
+            </div>
+          ) : productsError ? (
+            <SectionError onRetry={() => refetchProducts()} />
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {tabSections.map((sec) => (
+                <div key={sec.key}>
+                  <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">{sec.label}</h3>
+                  <ul className="space-y-4">
+                    {sec.items.map((p) => {
+                      const img = resolveImage(p.image_url);
+                      return (
+                        <li key={p.id}>
+                          <Link to="/product/$id" params={{ id: p.id }} className="flex gap-3 group">
+                            <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border">
+                              {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</div>
+                              <div className="mt-1"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
+                              <div className="mt-1 text-sm font-bold text-primary">{formatINR(p.price_paise)}</div>
+                            </div>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* TESTIMONIALS */}
