@@ -23,7 +23,7 @@ export function SiteHeader() {
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/marketplace", search: search ? { q: search } as never : undefined });
+    navigate({ to: "/marketplace", search: { q: search, category: "all", organic: false } });
     setMobileOpen(false);
   };
 
