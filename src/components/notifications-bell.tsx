@@ -64,18 +64,21 @@ export function NotificationsBell() {
           <div className="p-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Notifications</div>
           {items.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground">All quiet on the farm.</p>
-          ) : items.map((n) => (
-            <Link
-              key={n.id}
-              to={(n.link as any) ?? "#"}
-              onClick={() => setOpen(false)}
-              className="block p-3 border-b border-border hover:bg-muted/50"
-            >
-              <p className="text-sm font-medium">{n.title}</p>
-              {n.body && <p className="text-xs text-muted-foreground mt-0.5">{n.body}</p>}
-              <p className="font-mono text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString("en-IN")}</p>
-            </Link>
-          ))}
+          ) : items.map((n) => {
+            const inner = (
+              <>
+                <p className="text-sm font-medium">{n.title}</p>
+                {n.body && <p className="text-xs text-muted-foreground mt-0.5">{n.body}</p>}
+                <p className="font-mono text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString("en-IN")}</p>
+              </>
+            );
+            const cls = "block p-3 border-b border-border hover:bg-muted/50";
+            return n.link ? (
+              <Link key={n.id} to={n.link as string} onClick={() => setOpen(false)} className={cls}>{inner}</Link>
+            ) : (
+              <div key={n.id} className={cls}>{inner}</div>
+            );
+          })}
         </div>
       )}
     </div>
