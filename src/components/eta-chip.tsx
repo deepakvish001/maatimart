@@ -108,6 +108,22 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
             )}
           </div>
 
+          {/* Live cutoff countdown */}
+          {countdown && (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-card px-2.5 py-2">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Timer className="h-3 w-3" />
+                <span>
+                  {countdown.isToday ? (
+                    <>Order in <span className="font-semibold text-foreground">{countdown.label}</span> for same-day delivery</>
+                  ) : (
+                    <>Same-day cutoff in <span className="font-semibold text-foreground">{countdown.label}</span> (tomorrow {CUTOFF_LABEL})</>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="border-t border-border/60 pt-2 space-y-1 text-muted-foreground">
             <p>
               <span className="font-medium text-foreground">Same-day cutoff:</span> order before {CUTOFF_LABEL} for delivery today.
