@@ -1,14 +1,49 @@
-import { Truck, Info, MapPin, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Truck, Info, MapPin, Sparkles, Timer } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
 import { PincodePicker } from "@/components/pincode-picker";
 
+const CUTOFF_HOUR = 14; // 2 PM local
 const CUTOFF_LABEL = "2 PM";
 
+function nextCutoff(now: Date): Date {
+  const c = new Date(now);
+  c.setHours(CUTOFF_HOUR, 0, 0, 0);
+  if (now.getTime() >= c.getTime()) c.setDate(c.getDate() + 1);
+  return c;
+}
+
+function useCutoffCountdown(active: boolean) {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    if (!active) return;
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, [active]);
+  if (!now) return null;
+  const target = nextCutoff(now);
+  const diffMs = target.getTime() - now.getTime();
+  const totalSec = Math.max(0, Math.floor(diffMs / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const isToday = target.toDateString() === now.toDateString();
+  return {
+    label: `${pad(h)}:${pad(m)}:${pad(s)}`,
+    isToday,
+    targetDate: target,
+  };
+}
+
 export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?: string }) {
+  const [open, setOpen] = useState(false);
   const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
   const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
   const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
+  const countdown = useCutoffCountdown(open);
   return (
     <Popover>
       <PopoverTrigger asChild>
