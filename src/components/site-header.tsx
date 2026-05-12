@@ -34,12 +34,15 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full">
       {/* Top promo bar */}
       <div className="bg-accent text-accent-foreground text-xs">
-        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between gap-3 px-6">
           <div className="hidden sm:flex items-center gap-2 opacity-90">
             <MapPin className="h-3.5 w-3.5" /> Delivering across Maharashtra & Kerala
           </div>
-          <div className="flex items-center gap-1.5 font-medium">
-            <Leaf className="h-3.5 w-3.5" /> Free delivery on orders over ₹499
+          <div className="flex items-center gap-3 font-medium">
+            <PincodePicker compact />
+            <span className="hidden sm:inline-flex items-center gap-1.5">
+              <Leaf className="h-3.5 w-3.5" /> Free delivery on orders over ₹499
+            </span>
           </div>
         </div>
       </div>
