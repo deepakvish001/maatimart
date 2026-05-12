@@ -16,6 +16,7 @@ import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { VisitFarmLink } from "@/components/visit-farm-link";
+import { SaveFarmButton } from "@/components/save-farm-button";
 import {
   ProductGridSkeleton,
   DealCardSkeleton,
