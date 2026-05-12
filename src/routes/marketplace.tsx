@@ -98,6 +98,8 @@ function Marketplace() {
           stock: p.stock,
           cartTotalPaise: cartSubtotal,
           addingPaise: p.price_paise,
+          userPincode: pincode,
+          farmPincodes: p.farm?.delivery_pincodes ?? null,
         }).tone],
       }))
       .sort((a, b) => a.rank - b.rank)
