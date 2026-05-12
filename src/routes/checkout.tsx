@@ -11,6 +11,7 @@ import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { getDeliveryEta, etaToneClasses, type EtaTone } from "@/lib/delivery-eta";
+import { usePincode } from "@/lib/pincode-store";
 
 type ShippingId = "standard" | "express" | "scheduled";
 
