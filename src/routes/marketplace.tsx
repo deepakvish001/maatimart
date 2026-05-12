@@ -248,7 +248,7 @@ function Marketplace() {
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {data!.map((p) => (
+              {sortedData!.map((p) => (
                 <div key={p.id} className="rounded-3xl bg-card border border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden">
                   <ProductCard p={p} />
                 </div>
