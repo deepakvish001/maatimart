@@ -425,6 +425,10 @@ export type Database = {
         Args: { _product: string; _user: string }
         Returns: boolean
       }
+      user_owns_order_farm: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "consumer" | "farmer" | "admin"
