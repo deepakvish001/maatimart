@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useAuth } from "@/lib/auth-context";
 import { formatINR } from "@/lib/format";
+import { OrderTimeline } from "@/components/order-timeline";
 
 export const Route = createFileRoute("/orders")({ component: OrdersPage });
 
@@ -56,6 +57,7 @@ function OrdersPage() {
                   ))}
                 </ul>
                 <p className="mt-3 text-xs text-muted-foreground">Delivering to: {o.address}</p>
+                <OrderTimeline orderId={o.id} currentStatus={o.status} />
               </div>
             ))}
           </div>
