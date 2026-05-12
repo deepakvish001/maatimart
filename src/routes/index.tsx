@@ -25,18 +25,28 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const CATEGORY_TILES = [
-  { label: "Vegetables", count: 24, tint: "bg-[oklch(0.95_0.06_150)]" },
-  { label: "Fruits", count: 18, tint: "bg-[oklch(0.95_0.06_30)]" },
-  { label: "Spices", count: 32, tint: "bg-[oklch(0.95_0.08_80)]" },
-  { label: "Leafy Greens", count: 12, tint: "bg-[oklch(0.94_0.07_140)]" },
-  { label: "Organic", count: 41, tint: "bg-[oklch(0.94_0.06_120)]" },
-  { label: "Grains", count: 19, tint: "bg-[oklch(0.95_0.05_85)]" },
-  { label: "Pickles", count: 9, tint: "bg-[oklch(0.95_0.07_50)]" },
-  { label: "Honey & Ghee", count: 14, tint: "bg-[oklch(0.95_0.06_85)]" },
-  { label: "Pulses", count: 22, tint: "bg-[oklch(0.94_0.06_60)]" },
-  { label: "Snacks", count: 11, tint: "bg-[oklch(0.94_0.06_25)]" },
+type Cat = "all" | "vegetables" | "fruits" | "spices";
+const CATEGORY_TILES: { label: string; count: number; tint: string; category: Cat; organic?: boolean }[] = [
+  { label: "Vegetables", count: 24, tint: "bg-[oklch(0.95_0.06_150)]", category: "vegetables" },
+  { label: "Fruits", count: 18, tint: "bg-[oklch(0.95_0.06_30)]", category: "fruits" },
+  { label: "Spices", count: 32, tint: "bg-[oklch(0.95_0.08_80)]", category: "spices" },
+  { label: "Leafy Greens", count: 12, tint: "bg-[oklch(0.94_0.07_140)]", category: "vegetables" },
+  { label: "Organic", count: 41, tint: "bg-[oklch(0.94_0.06_120)]", category: "all", organic: true },
+  { label: "Grains", count: 19, tint: "bg-[oklch(0.95_0.05_85)]", category: "all" },
+  { label: "Pickles", count: 9, tint: "bg-[oklch(0.95_0.07_50)]", category: "all" },
+  { label: "Honey & Ghee", count: 14, tint: "bg-[oklch(0.95_0.06_85)]", category: "all" },
+  { label: "Pulses", count: 22, tint: "bg-[oklch(0.94_0.06_60)]", category: "all" },
+  { label: "Snacks", count: 11, tint: "bg-[oklch(0.94_0.06_25)]", category: "all" },
 ];
+
+const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
+  { label: "All", category: "all" },
+  { label: "Vegetables", category: "vegetables" },
+  { label: "Fruits", category: "fruits" },
+  { label: "Spices", category: "spices" },
+  { label: "Organic", category: "all", organic: true },
+];
+
 
 function Home() {
   const [email, setEmail] = useState("");
@@ -147,6 +157,7 @@ function Home() {
               <Link
                 key={c.label}
                 to="/marketplace"
+                search={{ category: c.category, organic: !!c.organic, q: "" }}
                 className={`group flex flex-col items-center justify-center rounded-2xl border border-border ${c.tint} p-3 aspect-square hover:border-primary/40 hover:-translate-y-0.5 transition-all text-center`}
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-background/70 mb-2">
@@ -186,8 +197,15 @@ function Home() {
               <p className="text-sm text-muted-foreground mt-1">Most loved by our customers</p>
             </div>
             <div className="hidden md:flex gap-1.5 text-xs">
-              {["All","Vegetables","Fruits","Spices","Organic"].map((t, i) => (
-                <Link key={t} to="/marketplace" className={`px-3 py-1.5 rounded-full font-semibold ${i === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary"}`}>{t}</Link>
+              {POPULAR_TABS.map((t, i) => (
+                <Link
+                  key={t.label}
+                  to="/marketplace"
+                  search={{ category: t.category, organic: !!t.organic, q: "" }}
+                  className={`px-3 py-1.5 rounded-full font-semibold ${i === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary"}`}
+                >
+                  {t.label}
+                </Link>
               ))}
             </div>
           </div>
