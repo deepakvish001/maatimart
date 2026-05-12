@@ -57,9 +57,20 @@ function Home() {
   const { data: farms } = useQuery({
     queryKey: ["home-farms"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("farms").select("id,name,region,story,image_url").limit(3);
+      const { data, error } = await supabase
+        .from("farms")
+        .select("id,name,region,story,image_url,products(rating_avg,rating_count,is_active)")
+        .limit(3);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((f) => {
+        const active = (f.products ?? []).filter((p: { is_active: boolean }) => p.is_active);
+        const rated = active.filter((p: { rating_count: number }) => p.rating_count > 0);
+        const totalReviews = rated.reduce((s: number, p: { rating_count: number }) => s + p.rating_count, 0);
+        const avg = rated.length
+          ? rated.reduce((s: number, p: { rating_avg: number; rating_count: number }) => s + (p.rating_avg ?? 0) * p.rating_count, 0) / Math.max(totalReviews, 1)
+          : 0;
+        return { ...f, productCount: active.length, avgRating: avg, totalReviews };
+      });
     },
   });
 
