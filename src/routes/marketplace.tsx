@@ -41,7 +41,7 @@ function Marketplace() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 px-6 py-12 mx-auto max-w-7xl w-full">
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-7xl w-full">
         <div className="mb-10">
           <h1 className="font-display text-5xl mb-2">The Marketplace</h1>
           <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">

@@ -88,7 +88,7 @@ function Home() {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/5">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:py-24 grid lg:grid-cols-12 gap-12 items-center">
+          <div className="mx-auto max-w-7xl px-6 py-12 md:py-16 lg:py-24 grid lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6">
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-6">
                 <Leaf className="h-3.5 w-3.5" /> 100% farm-fresh, every day
@@ -153,7 +153,7 @@ function Home() {
         </section>
 
         {/* Categories */}
-        <section className="px-6 py-16 mx-auto max-w-7xl">
+        <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="font-display text-3xl md:text-4xl">Shop by category</h2>
@@ -208,7 +208,7 @@ function Home() {
         </section>
 
         {/* Today's Deals */}
-        <section className="px-6 py-16 mx-auto max-w-7xl">
+        <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-8">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
@@ -227,7 +227,7 @@ function Home() {
         </section>
 
         {/* Fresh Arrivals */}
-        <section className="px-6 py-16 bg-card/40 border-y border-border">
+        <section className="px-4 md:px-6 py-12 md:py-16 bg-card/40 border-y border-border">
           <div className="mx-auto max-w-7xl">
             <div className="flex items-end justify-between mb-8">
               <div>
@@ -248,7 +248,7 @@ function Home() {
         </section>
 
         {/* Featured products */}
-        <section className="px-6 py-16 mx-auto max-w-7xl">
+        <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="font-display text-3xl md:text-4xl">Featured this week</h2>
@@ -264,7 +264,7 @@ function Home() {
         </section>
 
         {/* Top Farms */}
-        <section className="px-6 py-16 bg-card/50 border-y border-border">
+        <section className="px-4 md:px-6 py-12 md:py-16 bg-card/50 border-y border-border">
           <div className="mx-auto max-w-7xl">
             <div className="flex items-end justify-between mb-8">
               <div>
@@ -310,7 +310,7 @@ function Home() {
         </section>
 
         {/* Final CTA */}
-        <section className="px-6 py-20">
+        <section className="px-4 md:px-6 py-14 md:py-20">
           <div className="mx-auto max-w-5xl rounded-3xl bg-gradient-to-br from-primary to-accent text-primary-foreground p-10 md:p-16 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden />
             <h2 className="relative font-display text-4xl md:text-5xl mb-4">Ready for fresher groceries?</h2>

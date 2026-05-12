@@ -38,7 +38,7 @@ function ProductPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 px-6 py-12 mx-auto max-w-7xl w-full">
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-7xl w-full">
         {isLoading || !p ? (
           <p className="text-muted-foreground">Loading…</p>
         ) : (
