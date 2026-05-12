@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Countdown } from "@/components/countdown";
 import { heroImage, resolveImage } from "@/lib/seed-images";
+import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
