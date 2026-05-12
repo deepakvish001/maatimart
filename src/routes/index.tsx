@@ -440,6 +440,7 @@ function Home() {
                             <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
                           </span>
                         )}
+                        <SaveFarmButton farmId={f.id} className="absolute bottom-3 right-3" />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
                         <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
