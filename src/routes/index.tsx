@@ -25,18 +25,28 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const CATEGORY_TILES = [
-  { label: "Vegetables", count: 24, tint: "bg-[oklch(0.95_0.06_150)]" },
-  { label: "Fruits", count: 18, tint: "bg-[oklch(0.95_0.06_30)]" },
-  { label: "Spices", count: 32, tint: "bg-[oklch(0.95_0.08_80)]" },
-  { label: "Leafy Greens", count: 12, tint: "bg-[oklch(0.94_0.07_140)]" },
-  { label: "Organic", count: 41, tint: "bg-[oklch(0.94_0.06_120)]" },
-  { label: "Grains", count: 19, tint: "bg-[oklch(0.95_0.05_85)]" },
-  { label: "Pickles", count: 9, tint: "bg-[oklch(0.95_0.07_50)]" },
-  { label: "Honey & Ghee", count: 14, tint: "bg-[oklch(0.95_0.06_85)]" },
-  { label: "Pulses", count: 22, tint: "bg-[oklch(0.94_0.06_60)]" },
-  { label: "Snacks", count: 11, tint: "bg-[oklch(0.94_0.06_25)]" },
+type Cat = "all" | "vegetables" | "fruits" | "spices";
+const CATEGORY_TILES: { label: string; count: number; tint: string; category: Cat; organic?: boolean }[] = [
+  { label: "Vegetables", count: 24, tint: "bg-[oklch(0.95_0.06_150)]", category: "vegetables" },
+  { label: "Fruits", count: 18, tint: "bg-[oklch(0.95_0.06_30)]", category: "fruits" },
+  { label: "Spices", count: 32, tint: "bg-[oklch(0.95_0.08_80)]", category: "spices" },
+  { label: "Leafy Greens", count: 12, tint: "bg-[oklch(0.94_0.07_140)]", category: "vegetables" },
+  { label: "Organic", count: 41, tint: "bg-[oklch(0.94_0.06_120)]", category: "all", organic: true },
+  { label: "Grains", count: 19, tint: "bg-[oklch(0.95_0.05_85)]", category: "all" },
+  { label: "Pickles", count: 9, tint: "bg-[oklch(0.95_0.07_50)]", category: "all" },
+  { label: "Honey & Ghee", count: 14, tint: "bg-[oklch(0.95_0.06_85)]", category: "all" },
+  { label: "Pulses", count: 22, tint: "bg-[oklch(0.94_0.06_60)]", category: "all" },
+  { label: "Snacks", count: 11, tint: "bg-[oklch(0.94_0.06_25)]", category: "all" },
 ];
+
+const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
+  { label: "All", category: "all" },
+  { label: "Vegetables", category: "vegetables" },
+  { label: "Fruits", category: "fruits" },
+  { label: "Spices", category: "spices" },
+  { label: "Organic", category: "all", organic: true },
+];
+
 
 function Home() {
   const [email, setEmail] = useState("");
