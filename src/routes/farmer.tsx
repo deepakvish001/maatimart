@@ -6,12 +6,12 @@ import { LayoutDashboard, Package, ShoppingCart, Store } from "lucide-react";
 
 export const Route = createFileRoute("/farmer")({ component: FarmerLayout });
 
-const NAV = [
+const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/farmer", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/farmer/listings", label: "Listings", icon: Package },
   { to: "/farmer/orders", label: "Orders", icon: ShoppingCart },
   { to: "/farmer/profile", label: "Farm Profile", icon: Store },
-] as const;
+];
 
 function FarmerLayout() {
   const { user, roles, loading } = useAuth();
