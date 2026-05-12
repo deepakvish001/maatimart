@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Countdown } from "@/components/countdown";
 import { heroImage, resolveImage } from "@/lib/seed-images";
+import { resolveDealEnd } from "@/lib/deal-schedule";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
@@ -99,8 +100,12 @@ function Home() {
     ];
   }, [products]);
 
-  // Stable countdown targets
-  const dealEnds = useMemo(() => Date.now() + 1000 * 60 * 60 * 36, []);
+  // Per-deal countdown targets: prefer product.deal_ends_at if present,
+  // otherwise fall back to the configured daily schedule (next local midnight).
+  const dealTargets = useMemo(
+    () => deals.map((p) => resolveDealEnd((p as any).deal_ends_at ?? null)),
+    [deals]
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -247,13 +252,13 @@ function Home() {
             <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline hidden md:inline">All deals →</Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {deals.map((p) => {
+            {deals.map((p, i) => {
               const img = resolveImage(p.image_url);
               return (
                 <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
                     {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                    <Countdown target={dealEnds} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
+                    <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
                   </div>
                   <div className="p-5">
                     <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
