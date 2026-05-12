@@ -50,10 +50,14 @@ function WishlistPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/20">
       <SiteHeader />
-      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-7xl w-full">
-        <h1 className="font-display text-5xl mb-8">Saved for later</h1>
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-14 mx-auto max-w-7xl w-full">
+        <div className="mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Your collection</p>
+          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Saved for later</h1>
+          <p className="mt-2 text-muted-foreground">Bookmarked produce and growers, ready when you are.</p>
+        </div>
 
         <section className="mb-12">
           <h2 className="font-display text-2xl font-bold mb-4">Saved products</h2>
