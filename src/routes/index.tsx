@@ -257,9 +257,17 @@ function Home() {
               <div className="absolute -right-10 -bottom-10 h-44 w-44 rounded-full bg-primary-foreground/10" />
               <Leaf className="absolute right-6 top-6 h-10 w-10 opacity-30" />
             </div>
-            <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-              {dailyBest.map((p) => <ProductCard key={p.id} p={p} />)}
-            </div>
+            {productsError ? (
+              <div className="lg:col-span-3"><SectionError message="Couldn't load best sellers." onRetry={() => refetchProducts()} /></div>
+            ) : productsLoading ? (
+              <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-background"><div className="animate-pulse bg-muted/60 aspect-[4/3]" /><div className="p-4 space-y-2"><div className="h-4 bg-muted/60 rounded animate-pulse w-3/4" /><div className="h-3 bg-muted/60 rounded animate-pulse w-1/2" /></div></div>)}
+              </div>
+            ) : (
+              <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+                {dailyBest.map((p) => <ProductCard key={p.id} p={p} />)}
+              </div>
+            )}
           </div>
         </section>
 
