@@ -1,85 +1,81 @@
-## Maati — Farmer-to-Consumer Marketplace
+# Maati — Next Feature Set
 
-A full MVP for a direct farm-to-consumer platform with browsing, cart/checkout, role-based auth (consumer/farmer), and a farmer dashboard. Visual direction: **Editorial Soil** (deep green accent, warm cream background, Playfair Display + Inter + JetBrains Mono).
+The MVP covers browse → cart → checkout → farmer dashboard. To make it a complete, trust-worthy marketplace, the next round focuses on **payments, trust signals, discoverability, post-order experience, and farmer growth tools.**
 
-### Pages & Routes
+---
 
-```
-/                       Landing — hero, featured farm, fresh harvest grid, "for kisaan" section
-/marketplace            Full produce grid with filters (category, region, organic, price, search)
-/product/$id            Product detail — photo, farm story, price/unit, qty selector, add to cart
-/cart                   Cart line items, totals, checkout CTA
-/checkout               Address + payment (mocked) → places order
-/login, /signup         Email + password auth; signup picks role (consumer | farmer)
-/orders                 Consumer order history
-/farmer                 Farmer dashboard layout (sidebar)
-  /farmer               Overview: revenue, active orders, low stock
-  /farmer/listings      CRUD produce listings
-  /farmer/orders        Incoming orders table with status updates
-  /farmer/profile       Farm name, location, story, photo
-```
+## 1. Payments (Stripe via Lovable)
+- Replace the current "Place Order" stub with real Stripe Checkout (INR).
+- Webhook → mark order `paid`, decrement product stock atomically.
+- Order statuses: `pending_payment → paid → packed → out_for_delivery → delivered → cancelled`.
+- Refund / cancel flow for farmer + consumer (within 1 hour of placing).
 
-### Backend (Lovable Cloud)
+## 2. Reviews & Ratings
+- New tables: `product_reviews` (rating 1–5, comment, photo), `farm_reviews`.
+- Only consumers with a `delivered` order for that product/farm can review (RLS enforced).
+- Aggregate rating shown on `ProductCard`, product detail page, and farm page.
 
-Tables:
-- `profiles` (id → auth.users, full_name, phone, address)
-- `user_roles` (user_id, role: 'consumer' | 'farmer' | 'admin') — separate table, `has_role()` SECURITY DEFINER
-- `farms` (id, owner_id → auth.users, name, region, story, image_url)
-- `products` (id, farm_id, name, description, category, price_paise, unit, stock_kg, image_url, is_organic, is_active)
-- `orders` (id, consumer_id, total_paise, status, address, created_at)
-- `order_items` (id, order_id, product_id, farm_id, qty, unit_price_paise)
+## 3. Farm Profile Pages (public)
+- New route `/farm/$id` — farmer story, gallery, all active products, reviews, region map pin.
+- Link from every `ProductCard` and product detail.
+- Strengthens the "know your farmer" editorial angle.
 
-RLS:
-- Public read on `farms`, `products` (where active), `profiles` basic fields
-- Consumers: insert/select own orders/order_items
-- Farmers: select/update orders containing their farm's products; full CRUD on own farm + products
-- Auto-create profile + default 'consumer' role via signup trigger; signup form upgrades to 'farmer' when chosen
+## 4. Search & Smart Filters
+- Full-text search on product name + description (Postgres `tsvector` + GIN index).
+- Marketplace filters: category, region/state, organic, price range, in-stock, sort (newest, price, rating).
+- URL-synced filters (shareable links).
 
-Storage bucket: `produce-images` (public read, authenticated write, owner-only update/delete).
+## 5. Delivery & Logistics
+- Farmer sets delivery zones (pincodes served) and delivery fee per zone in profile.
+- Checkout validates pincode against farm zones; shows fee + ETA.
+- Order tracking timeline on `/orders/$id` with status updates pushed by farmer.
 
-### Design System (src/styles.css)
+## 6. Notifications
+- Email (Lovable Email): order placed, paid, packed, out for delivery, delivered (consumer); new order, low stock (farmer).
+- In-app toast + bell dropdown using Supabase Realtime on `orders` and `notifications` table.
 
-Replace tokens with Editorial Soil palette:
-- background: warm cream `oklch(0.96 0.02 85)`
-- foreground: deep ink `oklch(0.22 0.02 165)`
-- primary: terracotta `oklch(0.58 0.14 40)`
-- accent: deep forest green `oklch(0.32 0.06 155)`
-- muted: warm stone
-- Fonts: Playfair Display (display), Inter (sans), JetBrains Mono (mono) via Google Fonts in `__root.tsx` head links
-- Card grid uses 1px hairline dividers (bg-border between tiles)
+## 7. Farmer Growth Tools
+- **Analytics dashboard**: revenue (7/30/90d), units sold, top products, repeat-customer %.
+- **Inventory alerts**: auto low-stock badge when `stock < threshold`.
+- **Bulk image upload** for product gallery (multi-image per product).
+- **Coupons**: farmer-issued promo codes (% or flat off, expiry, usage cap).
 
-### Components
+## 8. Consumer Experience
+- Wishlist / favorites (per user table).
+- Reorder button on past orders.
+- Address book in profile (multiple saved addresses).
+- Subscription/recurring orders (weekly veggie box) — schema only this round, UI optional.
 
-- `SiteHeader` (sticky, blur, nav + cart badge + auth state)
-- `SiteFooter`
-- `ProductCard`, `FarmCard`
-- `CartDrawer` + Zustand cart store (persisted to localStorage)
-- `AuthProvider` (Supabase session via onAuthStateChange)
-- `ProtectedRoute` wrapper for /farmer/* and /checkout
-- `FarmerSidebar` (shadcn sidebar)
-- `EmptyState`, `PriceTag`, `OrganicBadge`
+## 9. Admin / Trust
+- `admin` role in `app_role` enum.
+- `/admin` route: verify farms (KYC doc upload + approve), moderate reviews, view all orders.
+- Verified badge on farm cards once approved.
 
-### Server Functions
+## 10. SEO & Polish
+- Per-route `head()` with og:image from product/farm hero.
+- JSON-LD `Product` and `LocalBusiness` schema.
+- Sitemap route `/sitemap.xml`.
+- Loading skeletons everywhere, empty states, 404 illustrations.
 
-- `lib/products.functions.ts` — listProducts(filters), getProduct(id)
-- `lib/orders.functions.ts` — placeOrder(items, address) [auth], listMyOrders(), listFarmerOrders(), updateOrderStatus()
-- `lib/farms.functions.ts` — getMyFarm(), upsertFarm(), upsertProduct(), deleteProduct()
+---
 
-All protected ones use `requireSupabaseAuth` middleware. Browser components call via `useServerFn` + react-query.
+## Suggested build order (ship in slices)
 
-### Images
+1. **Slice A — Money & Trust**: Stripe payments + reviews + farm public pages.
+2. **Slice B — Discovery**: search, filters, wishlist.
+3. **Slice C — Fulfillment**: delivery zones, order tracking, email notifications.
+4. **Slice D — Farmer growth**: analytics, coupons, bulk images, low-stock alerts.
+5. **Slice E — Admin & SEO polish**: admin role, KYC verification, JSON-LD, sitemap.
 
-Generate produce/farm photos with imagegen for landing hero, 8 seed products, and 3 featured farms. Save under `src/assets/`.
+---
 
-### Build order
+## Technical notes
 
-1. Enable Lovable Cloud
-2. Apply design tokens, fonts, base layout (header/footer)
-3. Auth pages + AuthProvider + role signup
-4. DB migration: tables, RLS, signup trigger, storage bucket
-5. Seed data (farms + products) + generated images
-6. Landing + marketplace + product detail
-7. Cart store + cart page + checkout + place order server fn
-8. Consumer orders page
-9. Farmer dashboard (sidebar, overview, listings CRUD, orders)
-10. Polish: empty states, loading skeletons, toasts, SEO meta per route
+- **DB migrations needed**: `product_reviews`, `farm_reviews`, `delivery_zones`, `notifications`, `coupons`, `wishlists`, `addresses`, `order_status_events`; add `rating_avg`, `rating_count`, `low_stock_threshold`, `search_tsv` columns; extend `app_role` with `admin`.
+- **RLS**: reviews gated by delivered orders; admin policies via `has_role(auth.uid(),'admin')`.
+- **Server fns**: `lib/payments.functions.ts` (create checkout session), `lib/reviews.functions.ts`, `lib/search.functions.ts`, `lib/analytics.functions.ts`. Webhooks under `src/routes/api/public/stripe-webhook.ts`.
+- **Realtime**: enable on `orders` and `notifications`.
+- **Storage**: new buckets `farm-kyc` (private), `review-photos` (public).
+
+Tell me which slice to start with (A is recommended) or if you want to reorder.
+
