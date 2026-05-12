@@ -59,7 +59,12 @@ const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
 function Home() {
   const [email, setEmail] = useState("");
 
-  const { data: products } = useQuery({
+  const {
+    data: products,
+    isLoading: productsLoading,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useQuery({
     queryKey: ["home-products"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -72,7 +77,12 @@ function Home() {
     },
   });
 
-  const { data: farms } = useQuery({
+  const {
+    data: farms,
+    isLoading: farmsLoading,
+    isError: farmsError,
+    refetch: refetchFarms,
+  } = useQuery({
     queryKey: ["home-farms"],
     queryFn: async () => {
       const { data, error } = await supabase
