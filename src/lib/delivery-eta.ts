@@ -60,6 +60,10 @@ export function getDeliveryEta(opts: {
   const remaining = Math.max(0, free - total);
   const expressEligible = total >= free;
   const now = opts.now ?? new Date();
+  const deliveryZone = getDeliveryZone(userPincode);
+  const cutoffHour = deliveryZone.cutoffHour;
+  const cutoffLabel = formatCutoffLabel(cutoffHour);
+  const cityLabel = deliveryZone.city;
 
   const base = {
     zone,
@@ -68,6 +72,9 @@ export function getDeliveryEta(opts: {
     freeThresholdPaise: free,
     remainingToFreePaise: remaining,
     expressEligible,
+    cutoffHour,
+    cutoffLabel,
+    cityLabel,
   };
 
   if (stock <= 0) {
