@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Leaf, Truck, ShieldCheck, Sprout, Apple, Carrot, Flame, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,9 +9,21 @@ import { heroImage, resolveImage } from "@/lib/seed-images";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Maati — Farm-direct produce from India's small growers" }] }),
+  head: () => ({
+    meta: [
+      { title: "Maati Mart — Fresh farm produce, delivered to your door" },
+      { name: "description", content: "Shop fresh vegetables, fruits and spices direct from Indian farms. Free delivery, transparent pricing, fair payouts to growers." },
+    ],
+  }),
   component: Home,
 });
+
+const CATEGORIES = [
+  { key: "vegetables", label: "Vegetables", icon: Carrot, tint: "bg-primary/10 text-primary" },
+  { key: "fruits", label: "Fruits", icon: Apple, tint: "bg-accent/10 text-accent" },
+  { key: "spices", label: "Spices", icon: Flame, tint: "bg-primary/10 text-primary" },
+  { key: "organic", label: "Organic", icon: Sprout, tint: "bg-accent/10 text-accent" },
+];
 
 function Home() {
   const { data: products } = useQuery({
@@ -18,9 +31,9 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,farms(name,region)")
+        .select("id,name,unit,price_paise,image_url,is_organic,rating_avg,rating_count,farms(name,region)")
         .eq("is_active", true)
-        .limit(4);
+        .limit(8);
       if (error) throw error;
       return (data ?? []).map((p) => ({ ...p, farm: p.farms }));
     },
@@ -35,97 +48,188 @@ function Home() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
       <main className="flex-1">
         {/* Hero */}
-        <section className="px-6 py-16 lg:py-24 mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-12 gap-12 items-end">
-            <div className="lg:col-span-7">
-              <div className="mb-6 inline-block bg-accent text-accent-foreground px-3 py-1 font-mono text-[10px] uppercase tracking-widest">
-                Featured · Sahyadri Collective
+        <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/5">
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:py-24 grid lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-6">
+                <Leaf className="h-3.5 w-3.5" /> 100% farm-fresh, every day
               </div>
-              <h1 className="font-display text-5xl md:text-7xl tracking-tight leading-[0.95] mb-8">
-                Straight from the <span className="text-primary italic">soil</span>, without the middleman.
+              <h1 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.02] mb-6">
+                Fresh produce, <span className="text-primary italic">delivered fast.</span>
               </h1>
-              <p className="max-w-[48ch] text-lg text-muted-foreground leading-relaxed mb-8">
-                Connecting India's small-scale farmers directly to your kitchen. Transparent pricing, heritage seeds, and rural empowerment — one harvest at a time.
+              <p className="max-w-[52ch] text-lg text-muted-foreground leading-relaxed mb-8">
+                Hand-picked vegetables, fruits, and spices sourced direct from Indian farms — at honest prices, with same-day delivery in your city.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                  <Link to="/marketplace">Browse the Harvest</Link>
+              <div className="flex flex-wrap gap-3 mb-10">
+                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-7">
+                  <Link to="/marketplace">Shop now <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link to="/signup">Sell as a Farmer</Link>
+                <Button asChild size="lg" variant="outline" className="rounded-full px-7 border-primary/30 hover:bg-primary/5">
+                  <Link to="/signup">Sell as a farmer</Link>
                 </Button>
+              </div>
+              <div className="grid grid-cols-3 gap-6 max-w-md">
+                {[
+                  { icon: Truck, label: "Free delivery", sub: "Orders over ₹499" },
+                  { icon: ShieldCheck, label: "Quality assured", sub: "Or money back" },
+                  { icon: Leaf, label: "Farm direct", sub: "No middlemen" },
+                ].map((f, i) => (
+                  <div key={i} className="text-center">
+                    <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <div className="text-xs font-semibold">{f.label}</div>
+                    <div className="text-[10px] text-muted-foreground">{f.sub}</div>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="lg:col-span-5">
-              <img src={heroImage} alt="Indian organic farm at golden hour" width={1600} height={1200}
-                className="w-full aspect-[4/5] object-cover" />
+            <div className="lg:col-span-6 relative">
+              <div className="relative">
+                <div className="absolute -inset-4 rounded-[2rem] bg-primary/10 blur-2xl" aria-hidden />
+                <img
+                  src={heroImage}
+                  alt="Fresh vegetables and fruits from Indian farms"
+                  width={1600}
+                  height={1200}
+                  className="relative w-full aspect-[4/3] object-cover rounded-3xl shadow-2xl shadow-primary/10 ring-1 ring-border"
+                />
+                <div className="absolute -bottom-6 -left-6 hidden md:flex items-center gap-3 rounded-2xl bg-background border border-border px-4 py-3 shadow-xl">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
+                    <Leaf className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Today's harvest</div>
+                    <div className="text-sm font-semibold">120+ fresh items</div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 hidden md:flex flex-col items-end rounded-2xl bg-primary text-primary-foreground px-4 py-3 shadow-xl">
+                  <div className="text-[10px] uppercase tracking-widest opacity-80">Up to</div>
+                  <div className="font-display text-2xl">30% off</div>
+                  <div className="text-[10px] opacity-80">First order</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Marketplace peek */}
-        <section className="px-6 py-20 border-t border-border bg-card/40">
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-              <div>
-                <h2 className="font-display text-4xl mb-2">Fresh Harvest</h2>
-                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                  Available today across Maharashtra & Kerala
-                </p>
-              </div>
-              <Button asChild variant="ghost" className="self-start md:self-end">
-                <Link to="/marketplace">View all →</Link>
+        {/* Categories */}
+        <section className="px-6 py-16 mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="font-display text-3xl md:text-4xl">Shop by category</h2>
+              <p className="text-sm text-muted-foreground mt-1">Everything you need for the week</p>
+            </div>
+            <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
+              <Link to="/marketplace">All categories <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {CATEGORIES.map((c) => (
+              <Link
+                key={c.key}
+                to="/marketplace"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <div className={`mb-4 grid h-14 w-14 place-items-center rounded-2xl ${c.tint}`}>
+                  <c.icon className="h-7 w-7" />
+                </div>
+                <div className="font-semibold text-lg">{c.label}</div>
+                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  Browse <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                </div>
+                <div className="absolute -right-6 -bottom-6 h-24 w-24 rounded-full bg-primary/5 transition-transform group-hover:scale-150" aria-hidden />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Promo strip */}
+        <section className="px-6">
+          <div className="mx-auto max-w-7xl grid md:grid-cols-2 gap-4">
+            <div className="relative overflow-hidden rounded-3xl bg-primary text-primary-foreground p-8 md:p-10">
+              <div className="text-xs uppercase tracking-widest opacity-80 mb-2">Weekend special</div>
+              <h3 className="font-display text-3xl md:text-4xl mb-3">Seasonal fruits — flat 20% off</h3>
+              <p className="opacity-90 mb-6 max-w-[40ch]">Mangoes, pomegranates and more, straight from the orchard.</p>
+              <Button asChild variant="secondary" className="rounded-full bg-background text-primary hover:bg-background/90">
+                <Link to="/marketplace">Shop fruits</Link>
               </Button>
+              <div className="absolute -right-12 -bottom-12 h-56 w-56 rounded-full bg-primary-foreground/10" aria-hidden />
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border">
-              {(products ?? []).map((p) => <ProductCard key={p.id} p={p} />)}
+            <div className="relative overflow-hidden rounded-3xl bg-accent text-accent-foreground p-8 md:p-10">
+              <div className="text-xs uppercase tracking-widest opacity-80 mb-2">New arrivals</div>
+              <h3 className="font-display text-3xl md:text-4xl mb-3">Heritage spices, single-origin</h3>
+              <p className="opacity-90 mb-6 max-w-[40ch]">Turmeric, cardamom and pepper from small Kerala growers.</p>
+              <Button asChild variant="secondary" className="rounded-full bg-background text-accent hover:bg-background/90">
+                <Link to="/marketplace">Explore spices</Link>
+              </Button>
+              <div className="absolute -right-12 -bottom-12 h-56 w-56 rounded-full bg-accent-foreground/10" aria-hidden />
             </div>
+          </div>
+        </section>
+
+        {/* Featured products */}
+        <section className="px-6 py-16 mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="font-display text-3xl md:text-4xl">Featured this week</h2>
+              <p className="text-sm text-muted-foreground mt-1">Picked fresh, delivered today</p>
+            </div>
+            <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/5">
+              <Link to="/marketplace">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
+            {(products ?? []).map((p) => <ProductCard key={p.id} p={p} />)}
           </div>
         </section>
 
         {/* Farms */}
-        <section className="px-6 py-20 mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl mb-2">Meet the Farms</h2>
-          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-12">
-            Real growers behind every basket
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {(farms ?? []).map((f) => {
-              const img = resolveImage(f.image_url);
-              return (
-                <article key={f.id} className="flex flex-col">
-                  {img && <img src={img} alt={f.name} loading="lazy" width={1200} height={900} className="aspect-[4/3] w-full object-cover mb-4" />}
-                  <h3 className="font-display text-2xl mb-1">{f.name}</h3>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">{f.region}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{f.story}</p>
-                </article>
-              );
-            })}
+        <section className="px-6 py-16 bg-card/50 border-y border-border">
+          <div className="mx-auto max-w-7xl">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-4">
+                <Sprout className="h-3.5 w-3.5" /> Meet the growers
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl mb-3">Real farms behind every basket</h2>
+              <p className="text-muted-foreground">Every product on Maati Mart is traceable to the family that grew it.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {(farms ?? []).map((f) => {
+                const img = resolveImage(f.image_url);
+                return (
+                  <Link to="/farm/$id" params={{ id: f.id }} key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
+                    {img && <img src={img} alt={f.name} loading="lazy" width={1200} height={900} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                    <div className="p-5">
+                      <h3 className="font-display text-xl mb-1">{f.name}</h3>
+                      <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{f.story}</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        {/* For farmers */}
-        <section className="px-6 py-24 bg-accent text-accent-foreground">
-          <div className="mx-auto max-w-7xl grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="font-display text-5xl mb-6 tracking-tight">Empowering the <span className="italic">Kisaan</span>.</h2>
-              <p className="text-lg text-accent-foreground/80 mb-10 leading-relaxed">
-                Farmers manage listings, monitor harvest cycles, and track earnings through a simple interface that works on low-bandwidth rural networks.
-              </p>
-              <ul className="space-y-4 mb-10">
-                {["Transparent payouts within 24 hours","Direct consumer feedback loop","Zero commission for first 90 days"].map((t,i) => (
-                  <li key={i} className="flex items-center gap-4 border-b border-accent-foreground/10 pb-4">
-                    <span className="font-mono text-primary">0{i+1}</span>
-                    <span className="font-medium">{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <Link to="/signup">Open your Farm Stand</Link>
+        {/* Final CTA */}
+        <section className="px-6 py-20">
+          <div className="mx-auto max-w-5xl rounded-3xl bg-gradient-to-br from-primary to-accent text-primary-foreground p-10 md:p-16 text-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden />
+            <h2 className="relative font-display text-4xl md:text-5xl mb-4">Ready for fresher groceries?</h2>
+            <p className="relative opacity-90 max-w-[50ch] mx-auto mb-8 text-lg">
+              Join thousands of households getting farm-direct produce every week.
+            </p>
+            <div className="relative flex flex-wrap justify-center gap-3">
+              <Button asChild size="lg" className="rounded-full bg-background text-primary hover:bg-background/90 px-8">
+                <Link to="/marketplace">Start shopping</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 px-8">
+                <Link to="/signup">Create account</Link>
               </Button>
             </div>
           </div>
