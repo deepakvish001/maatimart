@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { MapPin, Phone, ArrowLeft, ShieldCheck, Truck, Banknote } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart, cartTotal } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +15,9 @@ export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
 function CheckoutPage() {
   const { items, clear } = useCart();
-  const total = cartTotal(items);
+  const subtotal = cartTotal(items);
+  const deliveryFee = subtotal >= 49900 || subtotal === 0 ? 0 : 4900;
+  const total = subtotal + deliveryFee;
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
@@ -51,30 +55,101 @@ function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/20">
       <SiteHeader />
-      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-3xl w-full">
-        <h1 className="font-display text-5xl mb-8">Checkout</h1>
-        <div className="bg-card p-6 space-y-4">
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Delivery address</label>
-            <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={3}
-              className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-14 mx-auto max-w-6xl w-full">
+        <Link to="/cart" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-4">
+          <ArrowLeft className="h-4 w-4" /> Back to basket
+        </Link>
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Step 2 of 2</p>
+          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Checkout</h1>
+          <p className="mt-2 text-muted-foreground">Tell us where to deliver — we'll handle the rest.</p>
+        </div>
+
+        <div className="grid lg:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
+          <div className="space-y-6">
+            <section className="rounded-3xl border border-border bg-background p-6 md:p-8 shadow-sm">
+              <h2 className="font-display text-xl font-bold mb-5">Delivery details</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Delivery address</label>
+                  <div className="mt-1.5 relative">
+                    <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <textarea
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      rows={3}
+                      placeholder="Flat / House no, Street, Area, City, Pincode"
+                      className="w-full rounded-xl bg-muted/40 border border-border pl-10 pr-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-background transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Phone <span className="text-muted-foreground/70 normal-case font-normal">(optional)</span></label>
+                  <div className="mt-1.5 relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="w-full rounded-xl bg-muted/40 border border-border pl-10 pr-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-background transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-border bg-background p-6 md:p-8 shadow-sm">
+              <h2 className="font-display text-xl font-bold mb-5">Payment</h2>
+              <div className="rounded-2xl border-2 border-primary bg-primary/5 p-4 flex items-start gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground"><Banknote className="h-5 w-5" /></span>
+                <div className="flex-1">
+                  <p className="font-semibold">Cash on delivery</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Pay the rider when your basket arrives. UPI & cards coming soon.</p>
+                </div>
+                <span className="text-xs font-semibold text-primary">Selected</span>
+              </div>
+            </section>
           </div>
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Phone (optional)</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)}
-              className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
-          </div>
-          <div className="border-t border-border pt-4 flex justify-between">
-            <span>Total</span>
-            <span className="font-mono font-bold text-accent">{formatINR(total)}</span>
-          </div>
-          <p className="text-xs text-muted-foreground">Cash on delivery — payment on receipt. Production version supports UPI & cards.</p>
-          <Button onClick={placeOrder} disabled={submitting} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            {submitting ? "Placing order…" : "Place order"}
-          </Button>
-          <Link to="/cart" className="block text-center text-xs text-muted-foreground hover:text-primary">Back to cart</Link>
+
+          <aside className="lg:sticky lg:top-24 space-y-4">
+            <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
+              <h2 className="font-display text-xl font-bold mb-4">Order summary</h2>
+              <ul className="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4">
+                {items.map((i) => {
+                  const img = resolveImage(i.imageUrl);
+                  return (
+                    <li key={i.productId} className="flex gap-3 items-center">
+                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                        {img && <img src={img} alt={i.name} className="h-full w-full object-cover" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{i.name}</p>
+                        <p className="text-xs text-muted-foreground">× {i.qty} {i.unit}</p>
+                      </div>
+                      <p className="text-sm font-semibold">{formatINR(i.pricePaise * i.qty)}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+              <dl className="space-y-2 text-sm border-t border-border pt-4">
+                <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{formatINR(subtotal)}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{deliveryFee === 0 ? <span className="text-primary font-medium">Free</span> : formatINR(deliveryFee)}</dd></div>
+              </dl>
+              <div className="mt-4 pt-4 border-t border-border flex items-end justify-between">
+                <span className="font-semibold">Total</span>
+                <span className="font-display text-2xl font-bold text-primary">{formatINR(total)}</span>
+              </div>
+              <Button onClick={placeOrder} disabled={submitting} className="mt-5 w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
+                {submitting ? "Placing order…" : "Place order"}
+              </Button>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+                <div className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-primary" /> Secure</div>
+                <div className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-primary" /> Same-day</div>
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
       <SiteFooter />
