@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Leaf, Truck, ShieldCheck, Sprout, Apple, Carrot, Flame, ArrowRight } from "lucide-react";
+import { Leaf, Truck, ShieldCheck, Sprout, Apple, Carrot, Flame, ArrowRight, Tag, Sparkles, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
