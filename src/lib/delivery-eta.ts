@@ -4,6 +4,8 @@
 // optionally the user's delivery pincode + the farm's serviceable
 // pincode list.
 
+import { getDeliveryZone, formatCutoffLabel } from "./delivery-zones";
+
 export type EtaTone = "express" | "standard" | "slow";
 export type EtaZone = "local" | "regional" | "out-of-zone" | "unknown";
 
@@ -19,10 +21,13 @@ export interface DeliveryEta {
   freeThresholdPaise: number;
   remainingToFreePaise: number;
   expressEligible: boolean;
+  /** City-aware same-day cutoff derived from pincode. */
+  cutoffHour: number;
+  cutoffLabel: string;
+  cityLabel: string;
 }
 
 const FREE_THRESHOLD_PAISE = 49900; // ₹499 — matches cart-store / cart page
-const SAME_DAY_CUTOFF_HOUR = 14;     // before 2 PM local
 const RESTOCK_DAYS = "3–5 days";
 
 function fmt(date: Date): string {
