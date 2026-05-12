@@ -99,8 +99,12 @@ function Home() {
     ];
   }, [products]);
 
-  // Stable countdown targets
-  const dealEnds = useMemo(() => Date.now() + 1000 * 60 * 60 * 36, []);
+  // Per-deal countdown targets: prefer product.deal_ends_at if present,
+  // otherwise fall back to the configured daily schedule (next local midnight).
+  const dealTargets = useMemo(
+    () => deals.map((p) => resolveDealEnd((p as any).deal_ends_at ?? null)),
+    [deals]
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
