@@ -53,7 +53,7 @@ function CheckoutPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 px-6 py-12 mx-auto max-w-3xl w-full">
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-3xl w-full">
         <h1 className="font-display text-5xl mb-8">Checkout</h1>
         <div className="bg-card p-6 space-y-4">
           <div>

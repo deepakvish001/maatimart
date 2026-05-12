@@ -32,7 +32,7 @@ function WishlistPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 px-6 py-12 mx-auto max-w-7xl w-full">
+      <main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-7xl w-full">
         <h1 className="font-display text-5xl mb-8">Saved for later</h1>
         {(data?.length ?? 0) === 0 ? (
           <div className="bg-card p-10 text-center text-muted-foreground">

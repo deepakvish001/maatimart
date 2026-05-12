@@ -30,7 +30,7 @@ function FarmPage() {
   });
 
   if (isLoading || !data) {
-    return <div className="min-h-screen flex flex-col"><SiteHeader /><main className="flex-1 px-6 py-12 mx-auto max-w-7xl w-full text-muted-foreground">Loading farm…</main><SiteFooter /></div>;
+    return <div className="min-h-screen flex flex-col"><SiteHeader /><main className="flex-1 px-4 md:px-6 py-10 md:py-12 mx-auto max-w-7xl w-full text-muted-foreground">Loading farm…</main><SiteFooter /></div>;
   }
 
   const { farm, products } = data;
@@ -41,7 +41,7 @@ function FarmPage() {
       <SiteHeader />
       <main className="flex-1">
         <section className="border-b border-border">
-          <div className="mx-auto max-w-7xl px-6 py-12 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-12 grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <Link to="/marketplace" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary">← Marketplace</Link>
               <h1 className="font-display text-6xl mt-3 mb-3">{farm.name}</h1>
@@ -57,7 +57,7 @@ function FarmPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-12">
+        <section className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-12">
           <h2 className="font-display text-3xl mb-6">Fresh from the farm</h2>
           {products.length === 0 ? (
             <p className="text-muted-foreground">No active listings right now.</p>
