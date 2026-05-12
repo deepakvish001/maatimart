@@ -60,6 +60,10 @@ const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
 
 function Home() {
   const [email, setEmail] = useState("");
+  const [farmQuery, setFarmQuery] = useState("");
+  const [farmRegion, setFarmRegion] = useState<string>("all");
+  const [farmMinRating, setFarmMinRating] = useState<number>(0);
+  const [farmCategory, setFarmCategory] = useState<string>("all");
 
   const {
     data: products,
