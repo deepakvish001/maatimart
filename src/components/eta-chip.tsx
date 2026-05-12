@@ -1,12 +1,14 @@
-import { Truck, Info, MapPin } from "lucide-react";
+import { Truck, Info, MapPin, Sparkles } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
 import { PincodePicker } from "@/components/pincode-picker";
 
-const FREE_THRESHOLD_RUPEES = 499;
 const CUTOFF_LABEL = "2 PM";
 
 export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?: string }) {
+  const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
+  const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
+  const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -45,12 +47,35 @@ export function EtaChip({ eta, className = "" }: { eta: DeliveryEta; className?:
             <PincodePicker compact />
           </div>
 
+          {/* Free express progress */}
+          <div className="rounded-md border border-border/60 bg-card px-2.5 py-2">
+            {eta.expressEligible ? (
+              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                <Sparkles className="h-3 w-3" /> Free express unlocked!
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between text-foreground font-semibold">
+                  <span>Add ₹{remainingRupees} more</span>
+                  <span className="text-muted-foreground font-normal">for free express</span>
+                </div>
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-300"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                  <span>₹{Math.round(eta.cartTotalPaise / 100)} in cart</span>
+                  <span>₹{thresholdRupees} threshold</span>
+                </div>
+              </>
+            )}
+          </div>
+
           <div className="border-t border-border/60 pt-2 space-y-1 text-muted-foreground">
             <p>
               <span className="font-medium text-foreground">Same-day cutoff:</span> order before {CUTOFF_LABEL} for delivery today.
-            </p>
-            <p>
-              <span className="font-medium text-foreground">Free express:</span> unlocked when your cart reaches ₹{FREE_THRESHOLD_RUPEES}.
             </p>
             <p>
               <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date — out-of-zone pincodes can't be delivered.
