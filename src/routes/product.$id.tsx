@@ -2,16 +2,17 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Truck, ShieldCheck, Sprout, Minus, Plus, ShoppingBag, ArrowRight, MapPin } from "lucide-react";
+import { Leaf, Truck, ShieldCheck, Sprout, Minus, Plus, ShoppingBag, ArrowRight, MapPin, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { resolveImage } from "@/lib/seed-images";
 import { formatINR } from "@/lib/format";
-import { useCart } from "@/lib/cart-store";
+import { useCart, cartTotal } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { ProductReviews } from "@/components/product-reviews";
+import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
