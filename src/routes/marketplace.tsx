@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { SearchSchemaInput } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search, SlidersHorizontal, Leaf, Sparkles, X, Sprout, Apple, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/marketplace")({
     { title: "Marketplace — Maati Mart" },
     { name: "description", content: "Browse fresh, farm-direct produce from across India." },
   ] }),
-  validateSearch: (raw: Record<string, unknown>): MarketplaceSearch => {
+  validateSearch: (raw: Record<string, unknown> & SearchSchemaInput): MarketplaceSearch => {
     const c = String(raw.category ?? "all").toLowerCase();
     const s = String(raw.sort ?? "newest").toLowerCase();
     return {
