@@ -2,7 +2,18 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Truck, ShieldCheck, Sprout, Minus, Plus, ShoppingBag, ArrowRight, MapPin, Clock } from "lucide-react";
+import {
+  Leaf,
+  Truck,
+  ShieldCheck,
+  Sprout,
+  Minus,
+  Plus,
+  ShoppingBag,
+  ArrowRight,
+  MapPin,
+  Clock,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -30,7 +41,9 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,name,description,unit,price_paise,image_url,is_organic,stock,farm_id,rating_avg,rating_count,category,farms(id,name,region,story,image_url,delivery_pincodes)")
+        .select(
+          "id,name,description,unit,price_paise,image_url,is_organic,stock,farm_id,rating_avg,rating_count,category,farms(id,name,region,story,image_url,delivery_pincodes)",
+        )
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -55,7 +68,11 @@ function ProductPage() {
     { icon: Sprout, title: "Farm-fresh", desc: "Harvested to order" },
     { icon: Truck, title: "Same-day", desc: "Direct from the field" },
     { icon: ShieldCheck, title: "Fair-pay", desc: "Farmer keeps 80%" },
-    { icon: Leaf, title: p?.is_organic ? "Certified organic" : "Pesticide-light", desc: "Grown with care" },
+    {
+      icon: Leaf,
+      title: p?.is_organic ? "Certified organic" : "Pesticide-light",
+      desc: "Grown with care",
+    },
   ];
 
   return (
@@ -67,7 +84,9 @@ function ProductPage() {
         ) : (
           <>
             <nav className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-6">
-              <Link to="/marketplace" className="hover:text-primary">Marketplace</Link>
+              <Link to="/marketplace" className="hover:text-primary">
+                Marketplace
+              </Link>
               <span>/</span>
               <span className="text-foreground/70">{p.category}</span>
             </nav>
@@ -77,7 +96,13 @@ function ProductPage() {
               <div className="relative">
                 <div className="rounded-3xl overflow-hidden bg-card shadow-sm border border-border/50">
                   {productImg ? (
-                    <img src={productImg} alt={p.name} width={800} height={800} className="w-full aspect-square object-cover" />
+                    <img
+                      src={productImg}
+                      alt={p.name}
+                      width={800}
+                      height={800}
+                      className="w-full aspect-square object-cover"
+                    />
                   ) : (
                     <div className="w-full aspect-square bg-muted" />
                   )}
@@ -87,7 +112,9 @@ function ProductPage() {
                     <Leaf size={12} /> Organic
                   </span>
                 )}
-                <span className={`absolute top-4 right-4 rounded-full px-3 py-1.5 text-xs font-semibold shadow-md ${inStock ? "bg-emerald-500 text-white" : "bg-destructive text-destructive-foreground"}`}>
+                <span
+                  className={`absolute top-4 right-4 rounded-full px-3 py-1.5 text-xs font-semibold shadow-md ${inStock ? "bg-emerald-500 text-white" : "bg-destructive text-destructive-foreground"}`}
+                >
                   {inStock ? `${p.stock} ${p.unit} in stock` : "Sold out"}
                 </span>
               </div>
@@ -95,42 +122,65 @@ function ProductPage() {
               {/* Details panel */}
               <div className="flex flex-col">
                 <div className="rounded-3xl bg-card border border-border/50 p-6 md:p-8 shadow-sm">
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{p.category}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
+                    {p.category}
+                  </p>
                   <h1 className="font-display text-3xl md:text-4xl leading-tight mb-3">{p.name}</h1>
 
-                  <Link to="/farm/$id" params={{ id: p.farms!.id }} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-4">
+                  <Link
+                    to="/farm/$id"
+                    params={{ id: p.farms!.id }}
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-4"
+                  >
                     <MapPin size={14} /> {p.farms?.name} · {p.farms?.region}
                   </Link>
 
                   {p.rating_count > 0 && (
-                    <div className="mb-5"><StarRating value={p.rating_avg} count={p.rating_count} size={16} /></div>
+                    <div className="mb-5">
+                      <StarRating value={p.rating_avg} count={p.rating_count} size={16} />
+                    </div>
                   )}
 
                   <div className="flex items-baseline gap-2 mb-5">
-                    <span className="font-display text-4xl text-foreground font-semibold">{formatINR(p.price_paise)}</span>
+                    <span className="font-display text-4xl text-foreground font-semibold">
+                      {formatINR(p.price_paise)}
+                    </span>
                     <span className="text-sm text-muted-foreground">/ {p.unit}</span>
                   </div>
 
                   {p.description && (
-                    <p className="text-sm text-foreground/80 leading-relaxed mb-6">{p.description}</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed mb-6">
+                      {p.description}
+                    </p>
                   )}
 
                   {/* Benefits */}
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {benefits.map((b) => (
-                      <div key={b.title} className="flex items-start gap-3 rounded-2xl bg-muted/40 p-3">
-                        <span className="rounded-xl bg-primary/10 text-primary p-2"><b.icon size={16} /></span>
+                      <div
+                        key={b.title}
+                        className="flex items-start gap-3 rounded-2xl bg-muted/40 p-3"
+                      >
+                        <span className="rounded-xl bg-primary/10 text-primary p-2">
+                          <b.icon size={16} />
+                        </span>
                         <div>
                           <p className="text-xs font-semibold leading-tight">{b.title}</p>
-                          <p className="text-[11px] text-muted-foreground leading-tight">{b.desc}</p>
+                          <p className="text-[11px] text-muted-foreground leading-tight">
+                            {b.desc}
+                          </p>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Delivery ETA */}
-                  <div className={`mb-4 flex items-start gap-3 rounded-2xl border p-3 ${etaToneClasses(eta.tone)}`}>
-                    <span className="rounded-xl bg-background/60 p-2 mt-0.5"><Clock size={16} /></span>
+                  <div
+                    className={`mb-4 flex items-start gap-3 rounded-2xl border p-3 ${etaToneClasses(eta.tone)}`}
+                  >
+                    <span className="rounded-xl bg-background/60 p-2 mt-0.5">
+                      <Clock size={16} />
+                    </span>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold leading-tight">Delivery {eta.label}</p>
                       <p className="text-[11px] opacity-80 leading-tight mt-0.5">{eta.detail}</p>
@@ -147,7 +197,9 @@ function ProductPage() {
                       >
                         <Minus size={16} />
                       </button>
-                      <span className="px-4 font-mono font-semibold tabular-nums min-w-10 text-center">{qty}</span>
+                      <span className="px-4 font-mono font-semibold tabular-nums min-w-10 text-center">
+                        {qty}
+                      </span>
                       <button
                         onClick={() => setQty(qty + 1)}
                         className="h-10 w-10 inline-flex items-center justify-center rounded-lg hover:bg-background transition"
@@ -161,10 +213,17 @@ function ProductPage() {
                       disabled={!inStock}
                       className="flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base font-semibold shadow-sm"
                       onClick={() => {
-                        add({
-                          productId: p.id, farmId: p.farm_id, name: p.name, unit: p.unit,
-                          pricePaise: p.price_paise, imageUrl: p.image_url,
-                        }, qty);
+                        add(
+                          {
+                            productId: p.id,
+                            farmId: p.farm_id,
+                            name: p.name,
+                            unit: p.unit,
+                            pricePaise: p.price_paise,
+                            imageUrl: p.image_url,
+                          },
+                          qty,
+                        );
                         toast.success(`Added ${qty} × ${p.name} to cart`);
                       }}
                     >
@@ -177,14 +236,22 @@ function ProductPage() {
                 {/* Farm card */}
                 {p.farms && (
                   <div className="mt-6 rounded-3xl bg-card border border-border/50 p-6 shadow-sm">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">From the farm</p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+                      From the farm
+                    </p>
                     <div className="flex gap-4">
                       {farmImg && (
-                        <img src={farmImg} alt={p.farms.name} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
+                        <img
+                          src={farmImg}
+                          alt={p.farms.name}
+                          className="w-20 h-20 rounded-2xl object-cover shrink-0"
+                        />
                       )}
                       <div className="flex-1 min-w-0">
                         <h2 className="font-display text-lg mb-1">{p.farms.name}</h2>
-                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-3">{p.farms.story}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-3">
+                          {p.farms.story}
+                        </p>
                         <Link
                           to="/farm/$id"
                           params={{ id: p.farms.id }}

@@ -7,9 +7,15 @@ export function SiteFooter() {
           © 2026 Maati · Farm-direct produce, India
         </p>
         <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest">
-          <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-          <a href="#" className="hover:text-primary transition-colors">Logistics</a>
-          <a href="#" className="hover:text-primary transition-colors">Support</a>
+          <a href="#" className="hover:text-primary transition-colors">
+            Privacy
+          </a>
+          <a href="#" className="hover:text-primary transition-colors">
+            Logistics
+          </a>
+          <a href="#" className="hover:text-primary transition-colors">
+            Support
+          </a>
         </div>
       </div>
     </footer>

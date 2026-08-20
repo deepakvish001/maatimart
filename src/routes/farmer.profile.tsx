@@ -19,11 +19,16 @@ function FarmProfile() {
   const { data: farm } = useQuery({
     queryKey: ["my-farm", user?.id],
     enabled: !!user,
-    queryFn: async () => (await supabase.from("farms").select("*").eq("owner_id", user!.id).maybeSingle()).data,
+    queryFn: async () =>
+      (await supabase.from("farms").select("*").eq("owner_id", user!.id).maybeSingle()).data,
   });
 
   useEffect(() => {
-    if (farm) { setName(farm.name); setRegion(farm.region); setStory(farm.story ?? ""); }
+    if (farm) {
+      setName(farm.name);
+      setRegion(farm.region);
+      setStory(farm.story ?? "");
+    }
   }, [farm]);
 
   const save = async (e: React.FormEvent) => {
@@ -43,21 +48,50 @@ function FarmProfile() {
   return (
     <div>
       <h1 className="font-display text-4xl mb-2">Farm Profile</h1>
-      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-8">Tell consumers about your land</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-8">
+        Tell consumers about your land
+      </p>
       <form onSubmit={save} className="bg-card p-6 space-y-4 max-w-xl">
         <div>
-          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Farm name</label>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm" />
+          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Farm name
+          </label>
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm"
+          />
         </div>
         <div>
-          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Region (e.g. Sangli, Maharashtra)</label>
-          <input required value={region} onChange={(e) => setRegion(e.target.value)} className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm" />
+          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Region (e.g. Sangli, Maharashtra)
+          </label>
+          <input
+            required
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm"
+          />
         </div>
         <div>
-          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Story</label>
-          <textarea rows={4} value={story} onChange={(e) => setStory(e.target.value)} className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm" />
+          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Story
+          </label>
+          <textarea
+            rows={4}
+            value={story}
+            onChange={(e) => setStory(e.target.value)}
+            className="mt-1 w-full bg-background border border-border px-3 py-2 text-sm"
+          />
         </div>
-        <Button type="submit" disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">{saving ? "Saving…" : "Save"}</Button>
+        <Button
+          type="submit"
+          disabled={saving}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          {saving ? "Saving…" : "Save"}
+        </Button>
       </form>
     </div>
   );

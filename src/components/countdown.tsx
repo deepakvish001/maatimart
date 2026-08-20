@@ -17,13 +17,18 @@ export function Countdown({ target, className = "" }: { target: number; classNam
   }, [target]);
   const Cell = ({ v, l }: { v: number; l: string }) => (
     <div className="grid place-items-center rounded-lg bg-background border border-border w-12 h-14 shadow-sm">
-      <span className="font-display text-xl font-bold leading-none text-foreground tabular-nums">{String(v).padStart(2, "0")}</span>
+      <span className="font-display text-xl font-bold leading-none text-foreground tabular-nums">
+        {String(v).padStart(2, "0")}
+      </span>
       <span className="text-[9px] uppercase tracking-wider text-muted-foreground mt-0.5">{l}</span>
     </div>
   );
   return (
     <div className={`flex gap-1.5 ${className}`}>
-      <Cell v={t.d} l="Days" /><Cell v={t.h} l="Hrs" /><Cell v={t.m} l="Min" /><Cell v={t.s} l="Sec" />
+      <Cell v={t.d} l="Days" />
+      <Cell v={t.h} l="Hrs" />
+      <Cell v={t.m} l="Min" />
+      <Cell v={t.s} l="Sec" />
     </div>
   );
 }

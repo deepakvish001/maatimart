@@ -69,7 +69,10 @@ export function SiteHeader() {
                 placeholder="Search vegetables, fruits, spices…"
                 className="w-full rounded-full bg-muted/60 border border-border pl-10 pr-24 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-background transition-colors"
               />
-              <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-semibold hover:bg-primary/90">
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-semibold hover:bg-primary/90"
+              >
                 Search
               </button>
             </div>
@@ -77,12 +80,20 @@ export function SiteHeader() {
 
           <div className="ml-auto flex items-center gap-1">
             {user && (
-              <Link to="/wishlist" className="relative inline-flex items-center justify-center rounded-full p-2.5 hover:bg-primary/5 hover:text-primary transition-colors" aria-label="Wishlist">
+              <Link
+                to="/wishlist"
+                className="relative inline-flex items-center justify-center rounded-full p-2.5 hover:bg-primary/5 hover:text-primary transition-colors"
+                aria-label="Wishlist"
+              >
                 <Heart className="h-5 w-5" />
               </Link>
             )}
             <NotificationsBell />
-            <Link to="/cart" className="relative inline-flex items-center justify-center rounded-full p-2.5 hover:bg-primary/5 hover:text-primary transition-colors" aria-label="Cart">
+            <Link
+              to="/cart"
+              className="relative inline-flex items-center justify-center rounded-full p-2.5 hover:bg-primary/5 hover:text-primary transition-colors"
+              aria-label="Cart"
+            >
               <ShoppingBag className="h-5 w-5" />
               {count > 0 && (
                 <span className="absolute right-0 top-0 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">
@@ -92,7 +103,15 @@ export function SiteHeader() {
             </Link>
             <div className="hidden sm:flex items-center gap-1 ml-1">
               {user ? (
-                <Button variant="ghost" size="sm" className="rounded-full" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={async () => {
+                    await signOut();
+                    navigate({ to: "/" });
+                  }}
+                >
                   <UserIcon className="mr-1.5 h-4 w-4" /> Sign out
                 </Button>
               ) : (
@@ -100,7 +119,11 @@ export function SiteHeader() {
                   <Button asChild variant="ghost" size="sm" className="rounded-full">
                     <Link to="/login">Login</Link>
                   </Button>
-                  <Button asChild size="sm" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
                     <Link to="/signup">Join free</Link>
                   </Button>
                 </>
@@ -129,16 +152,24 @@ export function SiteHeader() {
               </Link>
             ))}
             {user && (
-              <Link to="/orders" className={`px-3 py-1.5 rounded-full font-medium transition-colors ${isActive("/orders") ? "bg-primary/10 text-primary" : "text-foreground/70 hover:text-primary hover:bg-primary/5"}`}>
+              <Link
+                to="/orders"
+                className={`px-3 py-1.5 rounded-full font-medium transition-colors ${isActive("/orders") ? "bg-primary/10 text-primary" : "text-foreground/70 hover:text-primary hover:bg-primary/5"}`}
+              >
                 My Orders
               </Link>
             )}
             {isFarmer && (
-              <Link to="/farmer" className="px-3 py-1.5 rounded-full font-medium text-foreground/70 hover:text-primary hover:bg-primary/5">
+              <Link
+                to="/farmer"
+                className="px-3 py-1.5 rounded-full font-medium text-foreground/70 hover:text-primary hover:bg-primary/5"
+              >
                 Farmer Hub
               </Link>
             )}
-            <span className="ml-auto text-xs text-muted-foreground">Fresh stock daily · Same-day delivery</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Fresh stock daily · Same-day delivery
+            </span>
           </div>
         </nav>
       </div>
@@ -158,18 +189,61 @@ export function SiteHeader() {
             </form>
             <div className="flex flex-col">
               {NAV.map((n) => (
-                <Link key={n.to} to={n.to} onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium border-b border-border/60">{n.label}</Link>
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  onClick={() => setMobileOpen(false)}
+                  className="py-2.5 text-sm font-medium border-b border-border/60"
+                >
+                  {n.label}
+                </Link>
               ))}
-              {user && <Link to="/orders" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium border-b border-border/60">My Orders</Link>}
-              {isFarmer && <Link to="/farmer" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium border-b border-border/60">Farmer Hub</Link>}
+              {user && (
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="py-2.5 text-sm font-medium border-b border-border/60"
+                >
+                  My Orders
+                </Link>
+              )}
+              {isFarmer && (
+                <Link
+                  to="/farmer"
+                  onClick={() => setMobileOpen(false)}
+                  className="py-2.5 text-sm font-medium border-b border-border/60"
+                >
+                  Farmer Hub
+                </Link>
+              )}
             </div>
             <div className="flex gap-2 pt-1">
               {user ? (
-                <Button className="flex-1 rounded-full" onClick={async () => { await signOut(); setMobileOpen(false); navigate({ to: "/" }); }}>Sign out</Button>
+                <Button
+                  className="flex-1 rounded-full"
+                  onClick={async () => {
+                    await signOut();
+                    setMobileOpen(false);
+                    navigate({ to: "/" });
+                  }}
+                >
+                  Sign out
+                </Button>
               ) : (
                 <>
-                  <Button asChild variant="outline" className="flex-1 rounded-full"><Link to="/login" onClick={() => setMobileOpen(false)}>Login</Link></Button>
-                  <Button asChild className="flex-1 rounded-full bg-primary text-primary-foreground"><Link to="/signup" onClick={() => setMobileOpen(false)}>Join free</Link></Button>
+                  <Button asChild variant="outline" className="flex-1 rounded-full">
+                    <Link to="/login" onClick={() => setMobileOpen(false)}>
+                      Login
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="flex-1 rounded-full bg-primary text-primary-foreground"
+                  >
+                    <Link to="/signup" onClick={() => setMobileOpen(false)}>
+                      Join free
+                    </Link>
+                  </Button>
                 </>
               )}
             </div>

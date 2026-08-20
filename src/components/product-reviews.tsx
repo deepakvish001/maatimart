@@ -46,12 +46,17 @@ export function ProductReviews({ productId }: { productId: string }) {
   const submit = async () => {
     if (!user) return;
     setSubmitting(true);
-    const { error } = await supabase.from("product_reviews").upsert(
-      { product_id: productId, user_id: user.id, rating, comment },
-      { onConflict: "product_id,user_id" },
-    );
+    const { error } = await supabase
+      .from("product_reviews")
+      .upsert(
+        { product_id: productId, user_id: user.id, rating, comment },
+        { onConflict: "product_id,user_id" },
+      );
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Review posted");
     setComment("");
     qc.invalidateQueries({ queryKey: ["reviews", productId] });
@@ -70,7 +75,10 @@ export function ProductReviews({ productId }: { productId: string }) {
           <div className="flex items-center gap-1 mb-3">
             {[1, 2, 3, 4, 5].map((i) => (
               <button key={i} onClick={() => setRating(i)} type="button">
-                <Star size={20} className={i <= rating ? "fill-accent text-accent" : "text-muted-foreground/40"} />
+                <Star
+                  size={20}
+                  className={i <= rating ? "fill-accent text-accent" : "text-muted-foreground/40"}
+                />
               </button>
             ))}
           </div>
@@ -81,21 +89,29 @@ export function ProductReviews({ productId }: { productId: string }) {
             rows={3}
             className="w-full bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
-          <Button onClick={submit} disabled={submitting} className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            onClick={submit}
+            disabled={submitting}
+            className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             {submitting ? "Posting…" : mine ? "Update review" : "Post review"}
           </Button>
         </div>
       )}
 
       {(reviews?.length ?? 0) === 0 ? (
-        <p className="text-sm text-muted-foreground">No reviews yet — be the first after your delivery arrives.</p>
+        <p className="text-sm text-muted-foreground">
+          No reviews yet — be the first after your delivery arrives.
+        </p>
       ) : (
         <ul className="space-y-4">
           {reviews!.map((r) => (
             <li key={r.id} className="bg-card p-5">
               <div className="flex items-center justify-between mb-2">
                 <StarRating value={r.rating} />
-                <span className="font-mono text-[10px] text-muted-foreground">{new Date(r.created_at).toLocaleDateString("en-IN")}</span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {new Date(r.created_at).toLocaleDateString("en-IN")}
+                </span>
               </div>
               {r.comment && <p className="text-sm text-foreground/90">{r.comment}</p>}
             </li>

@@ -55,7 +55,8 @@ function LoginPage() {
             Fresh from the soil. Straight to your kitchen.
           </h2>
           <p className="text-primary-foreground/85 text-base leading-relaxed">
-            Sign in to track orders, save your favourite farms, and unlock member-only deals from India's small growers.
+            Sign in to track orders, save your favourite farms, and unlock member-only deals from
+            India's small growers.
           </p>
           <div className="grid grid-cols-3 gap-3 pt-2">
             {[
@@ -63,7 +64,10 @@ function LoginPage() {
               { icon: Truck, label: "Same-day" },
               { icon: ShieldCheck, label: "Fair-pay" },
             ].map((f) => (
-              <div key={f.label} className="rounded-2xl bg-background/10 backdrop-blur border border-background/15 p-3 text-center">
+              <div
+                key={f.label}
+                className="rounded-2xl bg-background/10 backdrop-blur border border-background/15 p-3 text-center"
+              >
                 <f.icon className="mx-auto h-5 w-5 mb-1.5" />
                 <div className="text-xs font-medium">{f.label}</div>
               </div>
@@ -82,22 +86,31 @@ function LoginPage() {
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Leaf className="h-5 w-5" />
             </span>
-            <span className="font-display text-xl font-bold">Maati<span className="text-primary">Mart</span></span>
+            <span className="font-display text-xl font-bold">
+              Maati<span className="text-primary">Mart</span>
+            </span>
           </Link>
           <p className="text-sm text-muted-foreground">
-            New here? <Link to="/signup" className="font-medium text-primary hover:underline">Create account</Link>
+            New here?{" "}
+            <Link to="/signup" className="font-medium text-primary hover:underline">
+              Create account
+            </Link>
           </p>
         </div>
 
         <div className="my-auto mx-auto w-full max-w-md py-12">
           <div className="mb-8">
             <h1 className="font-display text-4xl font-bold tracking-tight">Welcome back</h1>
-            <p className="mt-2 text-muted-foreground">Sign in to continue your fresh produce journey.</p>
+            <p className="mt-2 text-muted-foreground">
+              Sign in to continue your fresh produce journey.
+            </p>
           </div>
 
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Email
+              </label>
               <div className="mt-1.5 relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -113,8 +126,12 @@ function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Password</label>
-                <button type="button" className="text-xs text-primary hover:underline">Forgot?</button>
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Password
+                </label>
+                <button type="button" className="text-xs text-primary hover:underline">
+                  Forgot?
+                </button>
               </div>
               <div className="mt-1.5 relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -141,19 +158,29 @@ function LoginPage() {
               disabled={loading}
               className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold shadow-sm"
             >
-              {loading ? "Signing in…" : (
-                <span className="inline-flex items-center gap-2">Sign in <ArrowRight className="h-4 w-4" /></span>
+              {loading ? (
+                "Signing in…"
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  Sign in <ArrowRight className="h-4 w-4" />
+                </span>
               )}
             </Button>
 
             <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-              <div className="relative flex justify-center text-xs"><span className="bg-background px-3 text-muted-foreground">or</span></div>
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-background px-3 text-muted-foreground">or</span>
+              </div>
             </div>
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/signup" className="font-medium text-primary hover:underline">Join MaatiMart free</Link>
+              <Link to="/signup" className="font-medium text-primary hover:underline">
+                Join MaatiMart free
+              </Link>
             </p>
           </form>
         </div>
