@@ -26,7 +26,7 @@ Requires [Bun](https://bun.sh) and a Supabase project.
 ```bash
 bun install
 cp .env.example .env    # then fill in your Supabase values
-bun run dev             # http://localhost:3000
+bun run dev             # Vite prints the local URL
 ```
 
 ### Environment
@@ -99,6 +99,12 @@ supabase/migrations/   SQL migrations
 
 Routes are generated into `src/routeTree.gen.ts` by the TanStack Router Vite
 plugin. That file is checked in but generated — don't edit it.
+
+Vite config comes from `@lovable.dev/vite-tanstack-config`, which already
+bundles the TanStack Start, React, Tailwind, tsconfig-paths and Cloudflare
+plugins. Adding any of them manually to `vite.config.ts` breaks the app with
+duplicate plugins. It also picks the dev host and port, so the URL is whatever
+the dev server prints.
 
 ## Conventions
 
