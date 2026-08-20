@@ -1,0 +1,9 @@
+# Resolve packages from the public npm registry.
+#
+# bun.lock previously carried absolute tarball URLs pointing at
+# `europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache`, a private
+# Artifact Registry mirror. Those 403 for anyone outside that sandbox — CI
+# and fresh clones included. Pinning the registry here keeps a future
+# `bun install` from writing sandbox-local URLs back into the lockfile.
+[install]
+registry = "https://registry.npmjs.org"
