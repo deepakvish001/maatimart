@@ -17,7 +17,7 @@ function WishlistPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login", search: { redirect: "/wishlist" } as any });
+    if (!loading && !user) navigate({ to: "/login", search: { redirect: "/wishlist" } });
   }, [loading, user, navigate]);
 
   const { data: products } = useQuery({

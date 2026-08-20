@@ -157,8 +157,8 @@ function CheckoutPage() {
       clear();
       toast.success("Order placed!");
       navigate({ to: "/orders" });
-    } catch (e: any) {
-      toast.error(e.message ?? "Failed to place order");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to place order");
     } finally {
       setSubmitting(false);
     }

@@ -54,7 +54,7 @@ function FarmerOrders() {
                 <p className="font-mono font-bold text-accent">{formatINR(o.total_paise)}</p>
               </div>
               <ul className="text-sm divide-y divide-border mb-3">
-                {o.order_items.map((i: any, idx: number) => (
+                {o.order_items.map((i, idx) => (
                   <li key={idx} className="py-2 flex justify-between">
                     <span>
                       {i.product_name} × {i.qty} {i.unit}

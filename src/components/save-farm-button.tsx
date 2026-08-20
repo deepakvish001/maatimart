@@ -30,7 +30,7 @@ export function SaveFarmButton({
         e.preventDefault();
         e.stopPropagation();
         if (!user) {
-          navigate({ to: "/login", search: { redirect: "/wishlist" } as any });
+          navigate({ to: "/login", search: { redirect: "/wishlist" } });
           return;
         }
         const nowSaved = await toggle(farmId);
