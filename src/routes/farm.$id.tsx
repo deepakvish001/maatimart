@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate, ErrorComponent, useRouter } from "@tanstack/react-router";
+import type { SearchSchemaInput } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Leaf, Truck, Sprout, Award, MapPin, Package } from "lucide-react";
@@ -20,7 +21,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 ];
 
 export const Route = createFileRoute("/farm/$id")({
-  validateSearch: (s: Record<string, unknown>): { sort: SortKey } => {
+  validateSearch: (s: Record<string, unknown> & SearchSchemaInput): { sort: SortKey } => {
     const sort = (s.sort as SortKey) || "featured";
     return { sort: SORT_OPTIONS.some((o) => o.value === sort) ? sort : "featured" };
   },
