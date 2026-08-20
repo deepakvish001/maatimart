@@ -26,7 +26,13 @@ export function PincodePicker({ compact = false }: { compact?: boolean }) {
   const label = pincode ? `Deliver to ${pincode}` : "Set pincode";
 
   return (
-    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (v) setDraft(pincode ?? ""); }}>
+    <Popover
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (v) setDraft(pincode ?? "");
+      }}
+    >
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -55,7 +61,10 @@ export function PincodePicker({ compact = false }: { compact?: boolean }) {
               maxLength={6}
               autoFocus
               value={draft}
-              onChange={(e) => { setDraft(e.target.value.replace(/\D/g, "").slice(0, 6)); setError(null); }}
+              onChange={(e) => {
+                setDraft(e.target.value.replace(/\D/g, "").slice(0, 6));
+                setError(null);
+              }}
               placeholder="e.g. 400001"
               className="flex-1 h-9 rounded-md border border-border bg-background px-2 text-sm font-medium tracking-wider focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
@@ -70,7 +79,11 @@ export function PincodePicker({ compact = false }: { compact?: boolean }) {
           {pincode && (
             <button
               type="button"
-              onClick={() => { setPincode(null); setDraft(""); setOpen(false); }}
+              onClick={() => {
+                setPincode(null);
+                setDraft("");
+                setOpen(false);
+              }}
               className="text-muted-foreground hover:text-destructive font-medium"
             >
               Clear pincode

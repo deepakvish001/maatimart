@@ -41,10 +41,12 @@ interface MarketplaceSearch {
 }
 
 export const Route = createFileRoute("/marketplace")({
-  head: () => ({ meta: [
-    { title: "Marketplace — Maati Mart" },
-    { name: "description", content: "Browse fresh, farm-direct produce from across India." },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Marketplace — Maati Mart" },
+      { name: "description", content: "Browse fresh, farm-direct produce from across India." },
+    ],
+  }),
   validateSearch: (raw: Record<string, unknown> & SearchSchemaInput): MarketplaceSearch => {
     const c = String(raw.category ?? "all").toLowerCase();
     const s = String(raw.sort ?? "newest").toLowerCase();
@@ -74,17 +76,28 @@ function Marketplace() {
     queryFn: async () => {
       let query = supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,farms(name,region,delivery_pincodes)")
+        .select(
+          "id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,farms(name,region,delivery_pincodes)",
+        )
         .eq("is_active", true);
       if (category !== "all") query = query.eq("category", category);
       if (organic) query = query.eq("is_organic", true);
       if (q) query = query.ilike("name", `%${q}%`);
       switch (sort) {
-        case "price-asc": query = query.order("price_paise", { ascending: true }); break;
-        case "price-desc": query = query.order("price_paise", { ascending: false }); break;
-        case "rating": query = query.order("rating_avg", { ascending: false }); break;
-        case "fastest": query = query.order("stock", { ascending: false, nullsFirst: false }); break;
-        default: query = query.order("created_at", { ascending: false });
+        case "price-asc":
+          query = query.order("price_paise", { ascending: true });
+          break;
+        case "price-desc":
+          query = query.order("price_paise", { ascending: false });
+          break;
+        case "rating":
+          query = query.order("rating_avg", { ascending: false });
+          break;
+        case "fastest":
+          query = query.order("stock", { ascending: false, nullsFirst: false });
+          break;
+        default:
+          query = query.order("created_at", { ascending: false });
       }
       const { data, error } = await query;
       if (error) throw error;
@@ -97,13 +110,15 @@ function Marketplace() {
     return [...data]
       .map((p) => ({
         p,
-        rank: TONE_RANK[getDeliveryEta({
-          stock: p.stock,
-          cartTotalPaise: cartSubtotal,
-          addingPaise: p.price_paise,
-          userPincode: pincode,
-          farmPincodes: p.farm?.delivery_pincodes ?? null,
-        }).tone],
+        rank: TONE_RANK[
+          getDeliveryEta({
+            stock: p.stock,
+            cartTotalPaise: cartSubtotal,
+            addingPaise: p.price_paise,
+            userPincode: pincode,
+            farmPincodes: p.farm?.delivery_pincodes ?? null,
+          }).tone
+        ],
       }))
       .sort((a, b) => a.rank - b.rank)
       .map((x) => x.p);
@@ -127,7 +142,8 @@ function Marketplace() {
               Today's harvest, from <span className="text-primary">verified Indian farms</span>
             </h1>
             <p className="mt-3 text-muted-foreground max-w-2xl">
-              Hand-picked produce, packed at the farm and on its way the same day. Filter by category, certification, or price.
+              Hand-picked produce, packed at the farm and on its way the same day. Filter by
+              category, certification, or price.
             </p>
           </div>
         </section>
@@ -139,7 +155,10 @@ function Marketplace() {
               <div className="flex flex-col lg:flex-row gap-3">
                 {/* Search */}
                 <div className="relative flex-1 min-w-0">
-                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Search
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
                   <input
                     value={q}
                     onChange={(e) => setSearch({ q: e.target.value })}
@@ -165,7 +184,11 @@ function Marketplace() {
                     onChange={(e) => setSearch({ sort: e.target.value as Sort })}
                     className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer min-w-40"
                   >
-                    {SORTS.map((s) => <option key={s} value={s}>{SORT_LABEL[s]}</option>)}
+                    {SORTS.map((s) => (
+                      <option key={s} value={s}>
+                        {SORT_LABEL[s]}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -204,7 +227,11 @@ function Marketplace() {
                 })}
                 {hasFilters && (
                   <button
-                    onClick={() => navigate({ search: { category: "all", organic: false, q: "", sort: "newest" } })}
+                    onClick={() =>
+                      navigate({
+                        search: { category: "all", organic: false, q: "", sort: "newest" },
+                      })
+                    }
                     className="ml-auto shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-destructive"
                   >
                     <X size={12} /> Clear filters
@@ -218,10 +245,13 @@ function Marketplace() {
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-                {category === "all" ? "All categories" : category}{organic && " · organic"}
+                {category === "all" ? "All categories" : category}
+                {organic && " · organic"}
               </p>
               <h2 className="font-display text-2xl">
-                {isLoading ? "Loading harvest…" : `${count} ${count === 1 ? "find" : "finds"} for you`}
+                {isLoading
+                  ? "Loading harvest…"
+                  : `${count} ${count === 1 ? "find" : "finds"} for you`}
               </h2>
             </div>
           </div>
@@ -230,7 +260,10 @@ function Marketplace() {
           {isLoading ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="rounded-3xl bg-card border border-border/50 p-4 animate-pulse">
+                <div
+                  key={i}
+                  className="rounded-3xl bg-card border border-border/50 p-4 animate-pulse"
+                >
                   <div className="aspect-square rounded-2xl bg-muted/60 mb-4" />
                   <div className="h-3 bg-muted/60 rounded w-3/4 mb-2" />
                   <div className="h-3 bg-muted/40 rounded w-1/2" />
@@ -243,9 +276,13 @@ function Marketplace() {
                 <Sprout size={24} />
               </div>
               <h3 className="font-display text-xl mb-1">No produce matches your filters</h3>
-              <p className="text-sm text-muted-foreground mb-5">Try removing a filter or searching for something else.</p>
+              <p className="text-sm text-muted-foreground mb-5">
+                Try removing a filter or searching for something else.
+              </p>
               <button
-                onClick={() => navigate({ search: { category: "all", organic: false, q: "", sort: "newest" } })}
+                onClick={() =>
+                  navigate({ search: { category: "all", organic: false, q: "", sort: "newest" } })
+                }
                 className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold hover:bg-primary/90"
               >
                 Reset all filters
@@ -254,7 +291,10 @@ function Marketplace() {
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {sortedData!.map((p) => (
-                <div key={p.id} className="rounded-3xl bg-card border border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden">
+                <div
+                  key={p.id}
+                  className="rounded-3xl bg-card border border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all overflow-hidden"
+                >
                   <ProductCard p={p} />
                 </div>
               ))}

@@ -2,8 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  Leaf, Truck, Sprout, ArrowRight, Tag, Sparkles, Star,
-  Headphones, RotateCcw, Package, Quote, Mail, Search, X,
+  Leaf,
+  Truck,
+  Sprout,
+  ArrowRight,
+  Tag,
+  Sparkles,
+  Star,
+  Headphones,
+  RotateCcw,
+  Package,
+  Quote,
+  Mail,
+  Search,
+  X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
@@ -29,19 +41,35 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Maati Mart — Fresh farm produce, delivered to your door" },
-      { name: "description", content: "Shop fresh vegetables, fruits and spices direct from Indian farms. Free delivery, transparent pricing, fair payouts to growers." },
+      {
+        name: "description",
+        content:
+          "Shop fresh vegetables, fruits and spices direct from Indian farms. Free delivery, transparent pricing, fair payouts to growers.",
+      },
     ],
   }),
   component: Home,
 });
 
 type Cat = "all" | "vegetables" | "fruits" | "spices";
-const CATEGORY_TILES: { label: string; count: number; tint: string; category: Cat; organic?: boolean }[] = [
+const CATEGORY_TILES: {
+  label: string;
+  count: number;
+  tint: string;
+  category: Cat;
+  organic?: boolean;
+}[] = [
   { label: "Vegetables", count: 24, tint: "bg-[oklch(0.95_0.06_150)]", category: "vegetables" },
   { label: "Fruits", count: 18, tint: "bg-[oklch(0.95_0.06_30)]", category: "fruits" },
   { label: "Spices", count: 32, tint: "bg-[oklch(0.95_0.08_80)]", category: "spices" },
   { label: "Leafy Greens", count: 12, tint: "bg-[oklch(0.94_0.07_140)]", category: "vegetables" },
-  { label: "Organic", count: 41, tint: "bg-[oklch(0.94_0.06_120)]", category: "all", organic: true },
+  {
+    label: "Organic",
+    count: 41,
+    tint: "bg-[oklch(0.94_0.06_120)]",
+    category: "all",
+    organic: true,
+  },
   { label: "Grains", count: 19, tint: "bg-[oklch(0.95_0.05_85)]", category: "all" },
   { label: "Pickles", count: 9, tint: "bg-[oklch(0.95_0.07_50)]", category: "all" },
   { label: "Honey & Ghee", count: 14, tint: "bg-[oklch(0.95_0.06_85)]", category: "all" },
@@ -56,7 +84,6 @@ const POPULAR_TABS: { label: string; category: Cat; organic?: boolean }[] = [
   { label: "Spices", category: "spices" },
   { label: "Organic", category: "all", organic: true },
 ];
-
 
 function Home() {
   const [email, setEmail] = useState("");
@@ -75,7 +102,9 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,created_at,farms(name,region,delivery_pincodes)")
+        .select(
+          "id,name,unit,price_paise,image_url,is_organic,stock,rating_avg,rating_count,created_at,farms(name,region,delivery_pincodes)",
+        )
         .eq("is_active", true)
         .limit(24);
       if (error) throw error;
@@ -93,17 +122,28 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("farms")
-        .select("id,name,region,story,image_url,products(category,rating_avg,rating_count,is_active)")
+        .select(
+          "id,name,region,story,image_url,products(category,rating_avg,rating_count,is_active)",
+        )
         .limit(24);
       if (error) throw error;
       return (data ?? []).map((f) => {
         const active = (f.products ?? []).filter((p: { is_active: boolean }) => p.is_active);
         const rated = active.filter((p: { rating_count: number }) => p.rating_count > 0);
-        const totalReviews = rated.reduce((s: number, p: { rating_count: number }) => s + p.rating_count, 0);
+        const totalReviews = rated.reduce(
+          (s: number, p: { rating_count: number }) => s + p.rating_count,
+          0,
+        );
         const avg = rated.length
-          ? rated.reduce((s: number, p: { rating_avg: number; rating_count: number }) => s + (p.rating_avg ?? 0) * p.rating_count, 0) / Math.max(totalReviews, 1)
+          ? rated.reduce(
+              (s: number, p: { rating_avg: number; rating_count: number }) =>
+                s + (p.rating_avg ?? 0) * p.rating_count,
+              0,
+            ) / Math.max(totalReviews, 1)
           : 0;
-        const categories = Array.from(new Set(active.map((p: { category: string }) => p.category).filter(Boolean)));
+        const categories = Array.from(
+          new Set(active.map((p: { category: string }) => p.category).filter(Boolean)),
+        );
         return { ...f, productCount: active.length, avgRating: avg, totalReviews, categories };
       });
     },
@@ -126,9 +166,7 @@ function Home() {
         .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
-      const reviews = (data ?? [])
-        .filter((r) => (r.comment ?? "").trim().length >= 12)
-        .slice(0, 3);
+      const reviews = (data ?? []).filter((r) => (r.comment ?? "").trim().length >= 12).slice(0, 3);
       if (reviews.length === 0) return [];
       const productIds = Array.from(new Set(reviews.map((r) => r.product_id)));
       const { data: prods } = await supabase
@@ -141,7 +179,10 @@ function Home() {
         : { data: [] as { id: string; name: string }[] };
       const farmMap = new Map((farms ?? []).map((f) => [f.id, f.name]));
       const prodMap = new Map(
-        (prods ?? []).map((p) => [p.id, { name: p.name, farms: { name: farmMap.get(p.farm_id) ?? "" } }])
+        (prods ?? []).map((p) => [
+          p.id,
+          { name: p.name, farms: { name: farmMap.get(p.farm_id) ?? "" } },
+        ]),
       );
       return reviews.map((r) => ({ ...r, products: prodMap.get(r.product_id) ?? null }));
     },
@@ -155,10 +196,28 @@ function Home() {
   const tabSections = useMemo(() => {
     const all = products ?? [];
     return [
-      { key: "selling", label: "Top Selling", items: [...all].sort((a, b) => (b.rating_count ?? 0) - (a.rating_count ?? 0)).slice(0, 4) },
-      { key: "trending", label: "Trending", items: [...all].sort(() => Math.random() - 0.5).slice(0, 4) },
-      { key: "recent", label: "Recently Added", items: [...all].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 4) },
-      { key: "rated", label: "Top Rated", items: [...all].sort((a, b) => (b.rating_avg ?? 0) - (a.rating_avg ?? 0)).slice(0, 4) },
+      {
+        key: "selling",
+        label: "Top Selling",
+        items: [...all].sort((a, b) => (b.rating_count ?? 0) - (a.rating_count ?? 0)).slice(0, 4),
+      },
+      {
+        key: "trending",
+        label: "Trending",
+        items: [...all].sort(() => Math.random() - 0.5).slice(0, 4),
+      },
+      {
+        key: "recent",
+        label: "Recently Added",
+        items: [...all]
+          .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
+          .slice(0, 4),
+      },
+      {
+        key: "rated",
+        label: "Top Rated",
+        items: [...all].sort((a, b) => (b.rating_avg ?? 0) - (a.rating_avg ?? 0)).slice(0, 4),
+      },
     ];
   }, [products]);
 
@@ -166,28 +225,30 @@ function Home() {
   // otherwise fall back to the configured daily schedule (next local midnight).
   const dealTargets = useMemo(
     () => deals.map((p) => resolveDealEnd((p as any).deal_ends_at ?? null)),
-    [deals]
+    [deals],
   );
 
   const farmRegions = useMemo(
     () => Array.from(new Set((farms ?? []).map((f) => f.region).filter(Boolean))).sort(),
-    [farms]
+    [farms],
   );
   const farmCategories = useMemo(
     () => Array.from(new Set((farms ?? []).flatMap((f) => f.categories ?? []))).sort(),
-    [farms]
+    [farms],
   );
   const filteredFarms = useMemo(() => {
     const q = farmQuery.trim().toLowerCase();
     return (farms ?? []).filter((f) => {
-      if (q && !f.name.toLowerCase().includes(q) && !(f.region ?? "").toLowerCase().includes(q)) return false;
+      if (q && !f.name.toLowerCase().includes(q) && !(f.region ?? "").toLowerCase().includes(q))
+        return false;
       if (farmRegion !== "all" && f.region !== farmRegion) return false;
       if (farmMinRating > 0 && f.avgRating < farmMinRating) return false;
       if (farmCategory !== "all" && !(f.categories ?? []).includes(farmCategory)) return false;
       return true;
     });
   }, [farms, farmQuery, farmRegion, farmMinRating, farmCategory]);
-  const farmFiltersActive = farmQuery.trim() !== "" || farmRegion !== "all" || farmMinRating > 0 || farmCategory !== "all";
+  const farmFiltersActive =
+    farmQuery.trim() !== "" || farmRegion !== "all" || farmMinRating > 0 || farmCategory !== "all";
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
@@ -200,12 +261,17 @@ function Home() {
                 <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.05] text-accent mb-3">
                   Fresh Vegetables
                 </h1>
-                <h2 className="font-display text-3xl md:text-5xl italic text-primary mb-5">Big discount</h2>
+                <h2 className="font-display text-3xl md:text-5xl italic text-primary mb-5">
+                  Big discount
+                </h2>
                 <p className="text-muted-foreground mb-7 max-w-md">
                   Save up to 50% off on your first order from India's farmer-direct marketplace.
                 </p>
                 <form
-                  onSubmit={(e) => { e.preventDefault(); setEmail(""); }}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setEmail("");
+                  }}
                   className="flex max-w-md bg-background rounded-full shadow-md p-1.5"
                 >
                   <div className="flex items-center pl-4 text-muted-foreground">
@@ -225,7 +291,11 @@ function Home() {
                 </form>
               </div>
               <div className="relative h-64 md:h-full min-h-[320px]">
-                <img src={heroImage} alt="Fresh produce" className="absolute inset-0 h-full w-full object-cover" />
+                <img
+                  src={heroImage}
+                  alt="Fresh produce"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.93_0.06_150)] via-transparent to-transparent md:block hidden" />
               </div>
             </div>
@@ -236,7 +306,9 @@ function Home() {
         <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-6">
             <h2 className="font-display text-2xl md:text-3xl font-bold">Top Categories</h2>
-            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
+            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">
+              View all →
+            </Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-10 gap-3">
             {CATEGORY_TILES.map((c) => (
@@ -260,14 +332,33 @@ function Home() {
         <section className="px-4 md:px-6 mx-auto max-w-7xl">
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { tint: "bg-[oklch(0.94_0.06_150)]", title: "Everyday fresh & clean produce", cta: "Shop now" },
-              { tint: "bg-[oklch(0.95_0.05_30)]", title: "Make breakfast healthy and easy", cta: "Shop now" },
-              { tint: "bg-[oklch(0.94_0.06_240)]", title: "The best organic harvest online", cta: "Shop now" },
+              {
+                tint: "bg-[oklch(0.94_0.06_150)]",
+                title: "Everyday fresh & clean produce",
+                cta: "Shop now",
+              },
+              {
+                tint: "bg-[oklch(0.95_0.05_30)]",
+                title: "Make breakfast healthy and easy",
+                cta: "Shop now",
+              },
+              {
+                tint: "bg-[oklch(0.94_0.06_240)]",
+                title: "The best organic harvest online",
+                cta: "Shop now",
+              },
             ].map((b, i) => (
-              <Link to="/marketplace" key={i} className={`group relative overflow-hidden rounded-2xl ${b.tint} p-7 min-h-[160px] flex flex-col justify-between`}>
-                <h3 className="font-display text-xl font-bold leading-tight max-w-[18ch]">{b.title}</h3>
+              <Link
+                to="/marketplace"
+                key={i}
+                className={`group relative overflow-hidden rounded-2xl ${b.tint} p-7 min-h-[160px] flex flex-col justify-between`}
+              >
+                <h3 className="font-display text-xl font-bold leading-tight max-w-[18ch]">
+                  {b.title}
+                </h3>
                 <span className="inline-flex items-center self-start rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-bold w-max">
-                  {b.cta} <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                  {b.cta}{" "}
+                  <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </span>
                 <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-background/40" />
               </Link>
@@ -296,12 +387,17 @@ function Home() {
             </div>
           </div>
           {productsError ? (
-            <SectionError message="Couldn't load popular products." onRetry={() => refetchProducts()} />
+            <SectionError
+              message="Couldn't load popular products."
+              onRetry={() => refetchProducts()}
+            />
           ) : productsLoading ? (
             <ProductGridSkeleton count={5} />
           ) : (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-              {popular.map((p) => <ProductCard key={p.id} p={p} />)}
+              {popular.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
             </div>
           )}
         </section>
@@ -312,24 +408,48 @@ function Home() {
           <div className="grid lg:grid-cols-4 gap-4">
             <div className="relative overflow-hidden rounded-2xl bg-[oklch(0.42_0.14_150)] text-primary-foreground p-8 lg:row-span-1 flex flex-col justify-between min-h-[320px]">
               <div>
-                <h3 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3">Bring nature into your home</h3>
-                <p className="opacity-90 text-sm max-w-[24ch]">Hand-picked from farms across India, every single day.</p>
+                <h3 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3">
+                  Bring nature into your home
+                </h3>
+                <p className="opacity-90 text-sm max-w-[24ch]">
+                  Hand-picked from farms across India, every single day.
+                </p>
               </div>
-              <Button asChild className="self-start rounded-full bg-background text-primary hover:bg-background/90">
-                <Link to="/marketplace">Shop now <ArrowRight className="ml-1 h-4 w-4" /></Link>
+              <Button
+                asChild
+                className="self-start rounded-full bg-background text-primary hover:bg-background/90"
+              >
+                <Link to="/marketplace">
+                  Shop now <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
               </Button>
               <div className="absolute -right-10 -bottom-10 h-44 w-44 rounded-full bg-primary-foreground/10" />
               <Leaf className="absolute right-6 top-6 h-10 w-10 opacity-30" />
             </div>
             {productsError ? (
-              <div className="lg:col-span-3"><SectionError message="Couldn't load best sellers." onRetry={() => refetchProducts()} /></div>
+              <div className="lg:col-span-3">
+                <SectionError
+                  message="Couldn't load best sellers."
+                  onRetry={() => refetchProducts()}
+                />
+              </div>
             ) : productsLoading ? (
               <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-background"><div className="animate-pulse bg-muted/60 aspect-[4/3]" /><div className="p-4 space-y-2"><div className="h-4 bg-muted/60 rounded animate-pulse w-3/4" /><div className="h-3 bg-muted/60 rounded animate-pulse w-1/2" /></div></div>)}
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-background">
+                    <div className="animate-pulse bg-muted/60 aspect-[4/3]" />
+                    <div className="p-4 space-y-2">
+                      <div className="h-4 bg-muted/60 rounded animate-pulse w-3/4" />
+                      <div className="h-3 bg-muted/60 rounded animate-pulse w-1/2" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-                {dailyBest.map((p) => <ProductCard key={p.id} p={p} />)}
+                {dailyBest.map((p) => (
+                  <ProductCard key={p.id} p={p} />
+                ))}
               </div>
             )}
           </div>
@@ -344,31 +464,65 @@ function Home() {
               </div>
               <h2 className="font-display text-2xl md:text-3xl font-bold">Deals of the Day</h2>
             </div>
-            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline hidden md:inline">All deals →</Link>
+            <Link
+              to="/marketplace"
+              className="text-sm font-semibold text-primary hover:underline hidden md:inline"
+            >
+              All deals →
+            </Link>
           </div>
           {productsError ? (
-            <SectionError message="Couldn't load today's deals." onRetry={() => refetchProducts()} />
+            <SectionError
+              message="Couldn't load today's deals."
+              onRetry={() => refetchProducts()}
+            />
           ) : productsLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => <DealCardSkeleton key={i} />)}
+              {Array.from({ length: 4 }).map((_, i) => (
+                <DealCardSkeleton key={i} />
+              ))}
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {deals.map((p, i) => {
                 const img = resolveImage(p.image_url);
                 return (
-                  <Link to="/product/$id" params={{ id: p.id }} key={p.id} className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all">
+                  <Link
+                    to="/product/$id"
+                    params={{ id: p.id }}
+                    key={p.id}
+                    className="group relative overflow-hidden rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg transition-all"
+                  >
                     <div className="relative aspect-[4/3] overflow-hidden bg-muted/40">
-                      {img && <img src={img} alt={p.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                      <Countdown target={dealTargets[i]} className="absolute bottom-3 left-1/2 -translate-x-1/2" />
+                      {img && (
+                        <img
+                          src={img}
+                          alt={p.name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      )}
+                      <Countdown
+                        target={dealTargets[i]}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2"
+                      />
                     </div>
                     <div className="p-5">
                       <h3 className="font-semibold leading-tight line-clamp-1">{p.name}</h3>
-                      {p.farm && <p className="text-xs text-muted-foreground mt-1 truncate">{p.farm.name} · {p.farm.region}</p>}
-                      <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
+                      {p.farm && (
+                        <p className="text-xs text-muted-foreground mt-1 truncate">
+                          {p.farm.name} · {p.farm.region}
+                        </p>
+                      )}
+                      <div className="mt-2">
+                        <StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} />
+                      </div>
                       <div className="mt-3 flex items-center justify-between">
-                        <span className="font-display text-xl font-bold text-primary">{formatINR(p.price_paise)}</span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">+ Add</span>
+                        <span className="font-display text-xl font-bold text-primary">
+                          {formatINR(p.price_paise)}
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs font-bold">
+                          + Add
+                        </span>
                       </div>
                     </div>
                   </Link>
@@ -382,7 +536,9 @@ function Home() {
         <section className="px-4 md:px-6 mx-auto max-w-7xl">
           {productsLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => <TabListSkeleton key={i} />)}
+              {Array.from({ length: 4 }).map((_, i) => (
+                <TabListSkeleton key={i} />
+              ))}
             </div>
           ) : productsError ? (
             <SectionError onRetry={() => refetchProducts()} />
@@ -390,20 +546,38 @@ function Home() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {tabSections.map((sec) => (
                 <div key={sec.key}>
-                  <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">{sec.label}</h3>
+                  <h3 className="font-display text-lg font-bold border-b-2 border-primary pb-2 mb-4 inline-block pr-4">
+                    {sec.label}
+                  </h3>
                   <ul className="space-y-4">
                     {sec.items.map((p) => {
                       const img = resolveImage(p.image_url);
                       return (
                         <li key={p.id}>
-                          <Link to="/product/$id" params={{ id: p.id }} className="flex gap-3 group">
+                          <Link
+                            to="/product/$id"
+                            params={{ id: p.id }}
+                            className="flex gap-3 group"
+                          >
                             <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border">
-                              {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
+                              {img && (
+                                <img
+                                  src={img}
+                                  alt={p.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</div>
-                              <div className="mt-1"><StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} /></div>
-                              <div className="mt-1 text-sm font-bold text-primary">{formatINR(p.price_paise)}</div>
+                              <div className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+                                {p.name}
+                              </div>
+                              <div className="mt-1">
+                                <StarRating value={p.rating_avg ?? 0} count={p.rating_count ?? 0} />
+                              </div>
+                              <div className="mt-1 text-sm font-bold text-primary">
+                                {formatINR(p.price_paise)}
+                              </div>
                             </div>
                           </Link>
                         </li>
@@ -418,23 +592,48 @@ function Home() {
 
         {/* TESTIMONIALS */}
         <section className="px-4 md:px-6 py-12 md:py-16 mx-auto max-w-7xl">
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">What our customers say</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
+            What our customers say
+          </h2>
           <p className="text-sm text-muted-foreground mb-8">Real households, real harvests.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: "Priya M.", city: "Mumbai", text: "The vegetables arrive incredibly fresh and the prices are honest. Knowing it goes straight to the farmer makes it even better." },
-              { name: "Rohan S.", city: "Pune", text: "Switched our whole weekly grocery to Maati. The mangoes from Ratnagiri are the best I've had in years." },
-              { name: "Anita K.", city: "Bengaluru", text: "Love the traceability — I can see exactly which farm every item came from. Delivery is always on time." },
-              { name: "Kabir D.", city: "Kochi", text: "Spices here taste different. Single-origin and clearly hand-picked. The team really cares." },
+              {
+                name: "Priya M.",
+                city: "Mumbai",
+                text: "The vegetables arrive incredibly fresh and the prices are honest. Knowing it goes straight to the farmer makes it even better.",
+              },
+              {
+                name: "Rohan S.",
+                city: "Pune",
+                text: "Switched our whole weekly grocery to Maati. The mangoes from Ratnagiri are the best I've had in years.",
+              },
+              {
+                name: "Anita K.",
+                city: "Bengaluru",
+                text: "Love the traceability — I can see exactly which farm every item came from. Delivery is always on time.",
+              },
+              {
+                name: "Kabir D.",
+                city: "Kochi",
+                text: "Spices here taste different. Single-origin and clearly hand-picked. The team really cares.",
+              },
             ].map((r) => (
-              <div key={r.name} className="rounded-2xl border border-border bg-background p-6 hover:border-primary/40 transition-colors">
+              <div
+                key={r.name}
+                className="rounded-2xl border border-border bg-background p-6 hover:border-primary/40 transition-colors"
+              >
                 <Quote className="h-6 w-6 text-primary mb-3" />
                 <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-primary text-primary" />)}
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+                  ))}
                 </div>
                 <p className="text-sm text-foreground/80 leading-relaxed mb-4">{r.text}</p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border">
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary font-bold text-sm">{r.name[0]}</div>
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary font-bold text-sm">
+                    {r.name[0]}
+                  </div>
                   <div>
                     <div className="text-sm font-semibold">{r.name}</div>
                     <div className="text-[11px] text-muted-foreground">{r.city}</div>
@@ -455,7 +654,12 @@ function Home() {
                 </div>
                 <h2 className="font-display text-2xl md:text-3xl font-bold">Top Farms</h2>
               </div>
-              <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
+              <Link
+                to="/marketplace"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                View all →
+              </Link>
             </div>
             <div className="grid gap-3 md:grid-cols-[1fr_auto_auto_auto_auto] mb-6 p-3 rounded-2xl border border-border bg-background">
               <div className="relative">
@@ -475,7 +679,11 @@ function Home() {
                 className="h-10 px-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
               >
                 <option value="all">All regions</option>
-                {farmRegions.map((r) => <option key={r} value={r}>{r}</option>)}
+                {farmRegions.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
               </select>
               <select
                 value={String(farmMinRating)}
@@ -495,12 +703,21 @@ function Home() {
                 className="h-10 px-3 rounded-xl bg-card border border-border text-sm focus:outline-none focus:border-primary"
               >
                 <option value="all">All categories</option>
-                {farmCategories.map((c) => <option key={c} value={c} className="capitalize">{c}</option>)}
+                {farmCategories.map((c) => (
+                  <option key={c} value={c} className="capitalize">
+                    {c}
+                  </option>
+                ))}
               </select>
               {farmFiltersActive && (
                 <button
                   type="button"
-                  onClick={() => { setFarmQuery(""); setFarmRegion("all"); setFarmMinRating(0); setFarmCategory("all"); }}
+                  onClick={() => {
+                    setFarmQuery("");
+                    setFarmRegion("all");
+                    setFarmMinRating(0);
+                    setFarmCategory("all");
+                  }}
                   className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl bg-muted text-sm font-semibold hover:bg-muted/70"
                 >
                   <X className="h-3.5 w-3.5" /> Clear
@@ -511,44 +728,74 @@ function Home() {
               <SectionError message="Couldn't load farms." onRetry={() => refetchFarms()} />
             ) : farmsLoading ? (
               <div className="grid md:grid-cols-3 gap-6">
-                {Array.from({ length: 3 }).map((_, i) => <FarmCardSkeleton key={i} />)}
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <FarmCardSkeleton key={i} />
+                ))}
               </div>
             ) : filteredFarms.length === 0 ? (
               <div className="rounded-2xl border border-border bg-background p-10 text-center text-sm text-muted-foreground">
-                No farms match these filters. <button onClick={() => { setFarmQuery(""); setFarmRegion("all"); setFarmMinRating(0); setFarmCategory("all"); }} className="text-primary font-semibold hover:underline">Reset</button>
+                No farms match these filters.{" "}
+                <button
+                  onClick={() => {
+                    setFarmQuery("");
+                    setFarmRegion("all");
+                    setFarmMinRating(0);
+                    setFarmCategory("all");
+                  }}
+                  className="text-primary font-semibold hover:underline"
+                >
+                  Reset
+                </button>
               </div>
             ) : (
               <div className="grid md:grid-cols-3 gap-6">
                 {filteredFarms.slice(0, 6).map((f) => {
                   const img = resolveImage(f.image_url);
                   return (
-                    <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
+                    <article
+                      key={f.id}
+                      className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg"
+                    >
                       <div className="relative">
-                        {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                        {img && (
+                          <img
+                            src={img}
+                            alt={f.name}
+                            className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        )}
                         <span className="absolute top-3 right-3 rounded-full bg-primary text-primary-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm">
                           {f.productCount} items
                         </span>
                         {f.avgRating > 0 && (
                           <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur px-2.5 py-1 text-xs font-bold shadow-sm">
-                            <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {f.avgRating.toFixed(1)}
+                            <Star className="h-3.5 w-3.5 fill-primary text-primary" />{" "}
+                            {f.avgRating.toFixed(1)}
                           </span>
                         )}
                         <SaveFarmButton farmId={f.id} className="absolute bottom-3 right-3" />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
                         <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
-                        <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
+                        <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">
+                          {f.region}
+                        </p>
                         <div className="flex items-center gap-2 mb-3 text-xs">
                           <StarRating value={f.avgRating} count={f.totalReviews} />
-                          {f.totalReviews === 0 && <span className="text-muted-foreground">No reviews yet</span>}
+                          {f.totalReviews === 0 && (
+                            <span className="text-muted-foreground">No reviews yet</span>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
+                          {f.story}
+                        </p>
                         <VisitFarmLink
                           farmId={f.id}
                           source="homepage"
                           className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold hover:bg-primary/90 transition-colors w-max"
                         >
-                          Visit farm <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                          Visit farm{" "}
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                         </VisitFarmLink>
                       </div>
                     </article>
@@ -566,7 +813,9 @@ function Home() {
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-2">
                 <Quote className="h-3.5 w-3.5" /> What shoppers say
               </div>
-              <h2 className="font-display text-2xl md:text-3xl font-bold">Loved by our community</h2>
+              <h2 className="font-display text-2xl md:text-3xl font-bold">
+                Loved by our community
+              </h2>
             </div>
           </div>
           {reviewsError ? (
@@ -574,19 +823,31 @@ function Home() {
           ) : reviewsLoading ? (
             <div className="grid md:grid-cols-3 gap-6">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="rounded-2xl border border-border bg-card p-6 h-48 animate-pulse" />
+                <div
+                  key={i}
+                  className="rounded-2xl border border-border bg-card p-6 h-48 animate-pulse"
+                />
               ))}
             </div>
           ) : (reviewHighlights ?? []).length === 0 ? (
-            <p className="text-sm text-muted-foreground">No reviews yet — be the first to share your experience.</p>
+            <p className="text-sm text-muted-foreground">
+              No reviews yet — be the first to share your experience.
+            </p>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {(reviewHighlights ?? []).map((r) => {
-                const initials = (r.user_id ?? "").replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase() || "MM";
+                const initials =
+                  (r.user_id ?? "")
+                    .replace(/[^a-z0-9]/gi, "")
+                    .slice(0, 2)
+                    .toUpperCase() || "MM";
                 const product = (r as any).products;
                 const farmName = product?.farms?.name;
                 return (
-                  <article key={r.id} className="relative flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all">
+                  <article
+                    key={r.id}
+                    className="relative flex flex-col rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all"
+                  >
                     <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/15" />
                     <div className="flex items-center gap-3 mb-4">
                       <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary font-bold text-sm">
@@ -603,7 +864,12 @@ function Home() {
                     {product?.name && (
                       <p className="mt-auto text-xs text-muted-foreground">
                         on <span className="font-semibold text-foreground">{product.name}</span>
-                        {farmName && <> from <span className="font-semibold text-foreground">{farmName}</span></>}
+                        {farmName && (
+                          <>
+                            {" "}
+                            from <span className="font-semibold text-foreground">{farmName}</span>
+                          </>
+                        )}
                       </p>
                     )}
                   </article>
@@ -620,14 +886,28 @@ function Home() {
               <h2 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3">
                 Stay home & get your daily needs from our farms
               </h2>
-              <p className="text-muted-foreground mb-6 max-w-md">Subscribe to weekly harvest drops and member-only deals.</p>
-              <form onSubmit={(e) => e.preventDefault()} className="flex max-w-md bg-background rounded-full shadow-md p-1.5">
-                <input placeholder="Your email address" className="flex-1 bg-transparent px-4 text-sm focus:outline-none" />
-                <button className="rounded-full bg-primary text-primary-foreground px-6 py-2.5 text-sm font-bold hover:bg-primary/90">Subscribe</button>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                Subscribe to weekly harvest drops and member-only deals.
+              </p>
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex max-w-md bg-background rounded-full shadow-md p-1.5"
+              >
+                <input
+                  placeholder="Your email address"
+                  className="flex-1 bg-transparent px-4 text-sm focus:outline-none"
+                />
+                <button className="rounded-full bg-primary text-primary-foreground px-6 py-2.5 text-sm font-bold hover:bg-primary/90">
+                  Subscribe
+                </button>
               </form>
             </div>
             <div className="relative h-56 md:h-full min-h-[260px]">
-              <img src={heroImage} alt="Fresh delivery" className="absolute inset-0 h-full w-full object-cover" />
+              <img
+                src={heroImage}
+                alt="Fresh delivery"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
             </div>
           </div>
         </section>
@@ -642,7 +922,10 @@ function Home() {
               { icon: RotateCcw, title: "Easy Returns", sub: "Within 24 hours" },
               { icon: Headphones, title: "24/7 Support", sub: "We're here for you" },
             ].map((s) => (
-              <div key={s.title} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+              <div
+                key={s.title}
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4"
+              >
                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary shrink-0">
                   <s.icon className="h-5 w-5" />
                 </div>

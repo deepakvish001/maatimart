@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Mail, Lock, User as UserIcon, ArrowRight, ShoppingBasket, Tractor, Check } from "lucide-react";
+import {
+  Leaf,
+  Mail,
+  Lock,
+  User as UserIcon,
+  ArrowRight,
+  ShoppingBasket,
+  Tractor,
+  Check,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { heroImage } from "@/lib/seed-images";
@@ -20,7 +29,8 @@ function SignupPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email, password,
+      email,
+      password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: { full_name: name, role },
@@ -32,9 +42,10 @@ function SignupPage() {
     navigate({ to: role === "farmer" ? "/farmer" : "/" });
   };
 
-  const perks = role === "farmer"
-    ? ["List produce in minutes", "Get paid directly, no middlemen", "Reach buyers across India"]
-    : ["Free delivery over ₹499", "Save favourite farms", "Member-only weekly deals"];
+  const perks =
+    role === "farmer"
+      ? ["List produce in minutes", "Get paid directly, no middlemen", "Reach buyers across India"]
+      : ["Free delivery over ₹499", "Save favourite farms", "Member-only weekly deals"];
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
@@ -45,25 +56,33 @@ function SignupPage() {
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Leaf className="h-5 w-5" />
             </span>
-            <span className="font-display text-xl font-bold">Maati<span className="text-primary">Mart</span></span>
+            <span className="font-display text-xl font-bold">
+              Maati<span className="text-primary">Mart</span>
+            </span>
           </Link>
           <p className="lg:hidden text-sm text-muted-foreground">
-            <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+            <Link to="/login" className="font-medium text-primary hover:underline">
+              Sign in
+            </Link>
           </p>
         </div>
 
         <div className="my-auto mx-auto w-full max-w-md py-10">
           <div className="mb-8">
             <h1 className="font-display text-4xl font-bold tracking-tight">Join MaatiMart</h1>
-            <p className="mt-2 text-muted-foreground">Buy direct or sell direct — pick your path below.</p>
+            <p className="mt-2 text-muted-foreground">
+              Buy direct or sell direct — pick your path below.
+            </p>
           </div>
 
           {/* Role toggle */}
           <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-muted/50 border border-border mb-6">
-            {([
-              { v: "consumer", label: "I'm a Buyer", icon: ShoppingBasket },
-              { v: "farmer", label: "I'm a Farmer", icon: Tractor },
-            ] as const).map((r) => (
+            {(
+              [
+                { v: "consumer", label: "I'm a Buyer", icon: ShoppingBasket },
+                { v: "farmer", label: "I'm a Farmer", icon: Tractor },
+              ] as const
+            ).map((r) => (
               <button
                 key={r.v}
                 type="button"
@@ -82,7 +101,9 @@ function SignupPage() {
 
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full name</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Full name
+              </label>
               <div className="mt-1.5 relative">
                 <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -95,7 +116,9 @@ function SignupPage() {
               </div>
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Email
+              </label>
               <div className="mt-1.5 relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -109,7 +132,9 @@ function SignupPage() {
               </div>
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Password</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Password
+              </label>
               <div className="mt-1.5 relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -129,14 +154,20 @@ function SignupPage() {
               disabled={loading}
               className="w-full h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold shadow-sm"
             >
-              {loading ? "Creating account…" : (
-                <span className="inline-flex items-center gap-2">Create account <ArrowRight className="h-4 w-4" /></span>
+              {loading ? (
+                "Creating account…"
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  Create account <ArrowRight className="h-4 w-4" />
+                </span>
               )}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
               Already with us?{" "}
-              <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+              <Link to="/login" className="font-medium text-primary hover:underline">
+                Sign in
+              </Link>
             </p>
           </form>
         </div>
@@ -160,7 +191,9 @@ function SignupPage() {
             <Leaf className="h-3.5 w-3.5" /> {role === "farmer" ? "For growers" : "For shoppers"}
           </span>
           <h2 className="font-display text-4xl xl:text-5xl leading-tight font-bold">
-            {role === "farmer" ? "Sell your harvest. Keep more of every rupee." : "Real food. Real farmers. Real fair."}
+            {role === "farmer"
+              ? "Sell your harvest. Keep more of every rupee."
+              : "Real food. Real farmers. Real fair."}
           </h2>
           <ul className="space-y-3 pt-2">
             {perks.map((p) => (

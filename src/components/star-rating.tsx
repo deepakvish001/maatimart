@@ -1,6 +1,14 @@
 import { Star } from "lucide-react";
 
-export function StarRating({ value, count, size = 14 }: { value: number; count?: number; size?: number }) {
+export function StarRating({
+  value,
+  count,
+  size = 14,
+}: {
+  value: number;
+  count?: number;
+  size?: number;
+}) {
   const rounded = Math.round(value);
   return (
     <div className="inline-flex items-center gap-1">

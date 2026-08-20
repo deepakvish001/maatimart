@@ -56,11 +56,17 @@ export function ProductCard({ p }: { p: ProductCardData }) {
       {/* Wishlist */}
       {ready && (
         <button
-          onClick={(e) => { e.preventDefault(); toggle(p.id); }}
+          onClick={(e) => {
+            e.preventDefault();
+            toggle(p.id);
+          }}
           aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
           className="absolute top-3 right-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-background/95 backdrop-blur shadow-sm border border-border hover:border-primary/40 hover:text-primary transition-colors"
         >
-          <Heart size={16} className={saved ? "fill-primary text-primary" : "text-muted-foreground"} />
+          <Heart
+            size={16}
+            className={saved ? "fill-primary text-primary" : "text-muted-foreground"}
+          />
         </button>
       )}
 
@@ -90,7 +96,9 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             </p>
           )}
           {typeof p.rating_count === "number" && p.rating_count > 0 ? (
-            <div className="mt-2"><StarRating value={p.rating_avg ?? 0} count={p.rating_count} /></div>
+            <div className="mt-2">
+              <StarRating value={p.rating_avg ?? 0} count={p.rating_count} />
+            </div>
           ) : (
             <div className="mt-2 text-[11px] text-muted-foreground">New listing</div>
           )}

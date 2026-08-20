@@ -37,9 +37,10 @@ export const useCart = create<CartState>()(
         }),
       setQty: (productId, qty) =>
         set((s) => ({
-          items: qty <= 0
-            ? s.items.filter((i) => i.productId !== productId)
-            : s.items.map((i) => (i.productId === productId ? { ...i, qty } : i)),
+          items:
+            qty <= 0
+              ? s.items.filter((i) => i.productId !== productId)
+              : s.items.map((i) => (i.productId === productId ? { ...i, qty } : i)),
         })),
       remove: (productId) =>
         set((s) => ({ items: s.items.filter((i) => i.productId !== productId) })),
@@ -52,5 +53,4 @@ export const useCart = create<CartState>()(
 export const cartTotal = (items: CartItem[]) =>
   items.reduce((sum, i) => sum + i.pricePaise * i.qty, 0);
 
-export const cartCount = (items: CartItem[]) =>
-  items.reduce((sum, i) => sum + i.qty, 0);
+export const cartCount = (items: CartItem[]) => items.reduce((sum, i) => sum + i.qty, 0);

@@ -16,18 +16,25 @@ export const Route = createFileRoute("/wishlist")({ component: WishlistPage });
 function WishlistPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  useEffect(() => { if (!loading && !user) navigate({ to: "/login", search: { redirect: "/wishlist" } as any }); }, [loading, user, navigate]);
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login", search: { redirect: "/wishlist" } as any });
+  }, [loading, user, navigate]);
 
   const { data: products } = useQuery({
     queryKey: ["wishlist", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: wl } = await supabase.from("wishlists").select("product_id").eq("user_id", user!.id);
+      const { data: wl } = await supabase
+        .from("wishlists")
+        .select("product_id")
+        .eq("user_id", user!.id);
       const ids = (wl ?? []).map((r) => r.product_id);
       if (!ids.length) return [];
       const { data: products } = await supabase
         .from("products")
-        .select("id,name,unit,price_paise,image_url,is_organic,farms(name,region,delivery_pincodes)")
+        .select(
+          "id,name,unit,price_paise,image_url,is_organic,farms(name,region,delivery_pincodes)",
+        )
         .in("id", ids);
       return (products ?? []).map((p) => ({ ...p, farm: p.farms }));
     },
@@ -37,7 +44,11 @@ function WishlistPage() {
     queryKey: ["farm-wishlist", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: wl } = await supabase.from("farm_wishlists").select("farm_id,created_at").eq("user_id", user!.id).order("created_at", { ascending: false });
+      const { data: wl } = await supabase
+        .from("farm_wishlists")
+        .select("farm_id,created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       const ids = (wl ?? []).map((r) => r.farm_id);
       if (!ids.length) return [];
       const { data: farms } = await supabase
@@ -54,20 +65,31 @@ function WishlistPage() {
       <SiteHeader />
       <main className="flex-1 px-4 md:px-6 py-10 md:py-14 mx-auto max-w-7xl w-full">
         <div className="mb-10">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Your collection</p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Saved for later</h1>
-          <p className="mt-2 text-muted-foreground">Bookmarked produce and growers, ready when you are.</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+            Your collection
+          </p>
+          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
+            Saved for later
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Bookmarked produce and growers, ready when you are.
+          </p>
         </div>
 
         <section className="mb-12">
           <h2 className="font-display text-2xl font-bold mb-4">Saved products</h2>
           {(products?.length ?? 0) === 0 ? (
             <div className="bg-card p-10 text-center text-muted-foreground border border-border rounded-2xl">
-              Nothing saved yet. <Link to="/marketplace" className="text-primary hover:underline">Browse the harvest →</Link>
+              Nothing saved yet.{" "}
+              <Link to="/marketplace" className="text-primary hover:underline">
+                Browse the harvest →
+              </Link>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border">
-              {products!.map((p) => <ProductCard key={p.id} p={p} />)}
+              {products!.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
             </div>
           )}
         </section>
@@ -83,22 +105,40 @@ function WishlistPage() {
           </div>
           {(savedFarms?.length ?? 0) === 0 ? (
             <div className="bg-card p-10 text-center text-muted-foreground border border-border rounded-2xl">
-              No saved farms yet. <Link to="/marketplace" className="text-primary hover:underline">Discover growers →</Link>
+              No saved farms yet.{" "}
+              <Link to="/marketplace" className="text-primary hover:underline">
+                Discover growers →
+              </Link>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {savedFarms!.map((f) => {
                 const img = resolveImage(f.image_url);
                 return (
-                  <article key={f.id} className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg">
+                  <article
+                    key={f.id}
+                    className="group flex flex-col rounded-2xl overflow-hidden bg-background border border-border hover:border-primary/40 transition-all hover:shadow-lg"
+                  >
                     <div className="relative">
-                      {img && <img src={img} alt={f.name} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                      {img && (
+                        <img
+                          src={img}
+                          alt={f.name}
+                          className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      )}
                       <SaveFarmButton farmId={f.id} className="absolute top-3 right-3" />
                     </div>
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
-                      <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">{f.region}</p>
-                      {f.story && <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">{f.story}</p>}
+                      <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-3">
+                        {f.region}
+                      </p>
+                      {f.story && (
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
+                          {f.story}
+                        </p>
+                      )}
                       <VisitFarmLink
                         farmId={f.id}
                         source="wishlist"

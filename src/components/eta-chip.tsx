@@ -1,7 +1,14 @@
 import { useEffect, useId, useState } from "react";
 import { Truck, Info, MapPin, Sparkles, Timer } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { etaToneClasses, type DeliveryEta } from "@/lib/delivery-eta";
 import { PincodePicker } from "@/components/pincode-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,7 +61,10 @@ function EtaBody({
   const thresholdRupees = Math.round(eta.freeThresholdPaise / 100);
   const remainingRupees = Math.ceil(eta.remainingToFreePaise / 100);
   const cartRupees = Math.round(eta.cartTotalPaise / 100);
-  const progressPct = Math.min(100, Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100));
+  const progressPct = Math.min(
+    100,
+    Math.round((eta.cartTotalPaise / eta.freeThresholdPaise) * 100),
+  );
   const countdown = useCutoffCountdown(open, eta.cutoffHour);
   const cutoffLabel = eta.cutoffLabel;
 
@@ -78,7 +88,13 @@ function EtaBody({
           {eta.pincode ? (
             <span>
               <span className="font-medium text-foreground">{eta.pincode}</span> ·{" "}
-              {eta.zone === "local" ? "Local zone" : eta.zone === "regional" ? "Regional" : eta.zone === "out-of-zone" ? "Out of zone" : ""}
+              {eta.zone === "local"
+                ? "Local zone"
+                : eta.zone === "regional"
+                  ? "Regional"
+                  : eta.zone === "out-of-zone"
+                    ? "Out of zone"
+                    : ""}
             </span>
           ) : (
             <span>No pincode set</span>
@@ -131,9 +147,21 @@ function EtaBody({
           <Timer className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           <span className="text-muted-foreground">
             {countdown.isToday ? (
-              <>Order in <span className="font-semibold text-foreground" aria-hidden="true">{countdown.label}</span> for same-day delivery</>
+              <>
+                Order in{" "}
+                <span className="font-semibold text-foreground" aria-hidden="true">
+                  {countdown.label}
+                </span>{" "}
+                for same-day delivery
+              </>
             ) : (
-              <>Same-day cutoff in <span className="font-semibold text-foreground" aria-hidden="true">{countdown.label}</span> (tomorrow {cutoffLabel})</>
+              <>
+                Same-day cutoff in{" "}
+                <span className="font-semibold text-foreground" aria-hidden="true">
+                  {countdown.label}
+                </span>{" "}
+                (tomorrow {cutoffLabel})
+              </>
             )}
           </span>
         </div>
@@ -146,7 +174,8 @@ function EtaBody({
           <span className="font-medium text-foreground">{eta.cityLabel}</span>.
         </p>
         <p>
-          <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date — out-of-zone pincodes can't be delivered.
+          <span className="font-medium text-foreground">Pincode:</span> set yours for an exact date
+          — out-of-zone pincodes can't be delivered.
         </p>
         {!mobile && <p className={`${small} opacity-70`}>Press Esc to close.</p>}
       </div>

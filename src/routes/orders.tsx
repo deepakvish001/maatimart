@@ -23,7 +23,9 @@ const STATUS_STYLES: Record<string, string> = {
 function OrdersPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  useEffect(() => { if (!loading && !user) navigate({ to: "/login", search: { redirect: "/orders" } }); }, [loading, user, navigate]);
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login", search: { redirect: "/orders" } });
+  }, [loading, user, navigate]);
 
   const { data } = useQuery({
     queryKey: ["my-orders", user?.id],
@@ -31,7 +33,9 @@ function OrdersPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id,total_paise,status,address,created_at,order_items(product_name,qty,unit,unit_price_paise)")
+        .select(
+          "id,total_paise,status,address,created_at,order_items(product_name,qty,unit,unit_price_paise)",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -44,8 +48,12 @@ function OrdersPage() {
       <main className="flex-1 px-4 md:px-6 py-10 md:py-14 mx-auto max-w-5xl w-full">
         <div className="mb-8 flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">My account</p>
-            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Your orders</h1>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+              My account
+            </p>
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
+              Your orders
+            </h1>
             <p className="mt-2 text-muted-foreground">Track every basket from farm to doorstep.</p>
           </div>
           {(data?.length ?? 0) > 0 && (
@@ -62,8 +70,13 @@ function OrdersPage() {
               <Package className="h-7 w-7" />
             </div>
             <h2 className="font-display text-2xl font-bold mb-2">No orders yet</h2>
-            <p className="text-muted-foreground mb-6">Your harvest history will appear here once you place an order.</p>
-            <Link to="/marketplace" className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-6 h-11 font-semibold hover:bg-primary/90 transition-colors">
+            <p className="text-muted-foreground mb-6">
+              Your harvest history will appear here once you place an order.
+            </p>
+            <Link
+              to="/marketplace"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-6 h-11 font-semibold hover:bg-primary/90 transition-colors"
+            >
               Browse the harvest <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -72,20 +85,37 @@ function OrdersPage() {
             {data!.map((o) => {
               const statusStyle = STATUS_STYLES[o.status] ?? "bg-muted text-foreground";
               return (
-                <article key={o.id} className="rounded-3xl border border-border bg-background shadow-sm overflow-hidden">
+                <article
+                  key={o.id}
+                  className="rounded-3xl border border-border bg-background shadow-sm overflow-hidden"
+                >
                   <header className="px-6 py-4 border-b border-border flex flex-wrap items-center justify-between gap-3 bg-muted/20">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary"><Receipt className="h-5 w-5" /></span>
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                        <Receipt className="h-5 w-5" />
+                      </span>
                       <div>
-                        <p className="font-mono text-xs text-muted-foreground">Order #{o.id.slice(0, 8).toUpperCase()}</p>
-                        <p className="text-sm font-medium">{new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+                        <p className="font-mono text-xs text-muted-foreground">
+                          Order #{o.id.slice(0, 8).toUpperCase()}
+                        </p>
+                        <p className="text-sm font-medium">
+                          {new Date(o.created_at).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${statusStyle}`}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${statusStyle}`}
+                      >
                         {o.status}
                       </span>
-                      <p className="font-display text-xl font-bold text-primary">{formatINR(o.total_paise)}</p>
+                      <p className="font-display text-xl font-bold text-primary">
+                        {formatINR(o.total_paise)}
+                      </p>
                     </div>
                   </header>
                   <div className="p-6 grid md:grid-cols-[1fr_220px] gap-6">
@@ -93,8 +123,15 @@ function OrdersPage() {
                       <ul className="divide-y divide-border text-sm">
                         {o.order_items.map((i, idx) => (
                           <li key={idx} className="py-2.5 flex justify-between gap-4">
-                            <span className="truncate"><span className="font-medium">{i.product_name}</span> <span className="text-muted-foreground">× {i.qty} {i.unit}</span></span>
-                            <span className="font-mono text-muted-foreground shrink-0">{formatINR(i.unit_price_paise * Number(i.qty))}</span>
+                            <span className="truncate">
+                              <span className="font-medium">{i.product_name}</span>{" "}
+                              <span className="text-muted-foreground">
+                                × {i.qty} {i.unit}
+                              </span>
+                            </span>
+                            <span className="font-mono text-muted-foreground shrink-0">
+                              {formatINR(i.unit_price_paise * Number(i.qty))}
+                            </span>
                           </li>
                         ))}
                       </ul>
