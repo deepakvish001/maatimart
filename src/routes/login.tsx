@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { SearchSchemaInput } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Leaf, Mail, Lock, ArrowRight, Sprout, Truck, ShieldCheck } from "lucide-react";
@@ -7,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { heroImage } from "@/lib/seed-images";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (s) => ({ redirect: (s.redirect as string) || "/" }),
+  validateSearch: (s: Record<string, unknown> & SearchSchemaInput) => ({
+    redirect: (s.redirect as string) || "/",
+  }),
   component: LoginPage,
 });
 
