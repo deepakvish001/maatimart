@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref — a PR only needs its newest commit checked.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Typecheck, lint and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The repo's lockfile is bun.lock, so the toolchain here is bun.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      # Non-blocking for now: `main` currently carries ~946 lint errors, almost
+      # all Prettier formatting. Flip `continue-on-error` off once those are
+      # cleared so lint regressions start failing the build.
+      - name: Lint
+        run: bun run lint
+        continue-on-error: true
+
+      - name: Build
+        run: bun run build
