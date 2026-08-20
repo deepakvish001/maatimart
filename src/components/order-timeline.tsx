@@ -23,8 +23,9 @@ export function OrderTimeline({
   });
 
   const reached = (s: string) => {
-    const i = FLOW.indexOf(s as any);
-    const c = FLOW.indexOf(currentStatus as any);
+    const flow: readonly string[] = FLOW;
+    const i = flow.indexOf(s);
+    const c = flow.indexOf(currentStatus);
     return i >= 0 && c >= i;
   };
 

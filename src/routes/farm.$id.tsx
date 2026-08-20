@@ -6,7 +6,7 @@ import {
   ErrorComponent,
   useRouter,
 } from "@tanstack/react-router";
-import type { SearchSchemaInput } from "@tanstack/react-router";
+import type { ErrorComponentProps, SearchSchemaInput } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Leaf, Truck, Sprout, Award, MapPin, Package } from "lucide-react";
@@ -27,31 +27,33 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "newest", label: "Newest" },
 ];
 
+function FarmErrorComponent({ error }: ErrorComponentProps) {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 px-4 md:px-6 py-12 mx-auto max-w-3xl w-full text-center">
+        <h1 className="font-display text-2xl mb-2">Couldn't load this farm</h1>
+        <ErrorComponent error={error} />
+        <button
+          onClick={() => router.invalidate()}
+          className="mt-4 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold"
+        >
+          Try again
+        </button>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/farm/$id")({
   validateSearch: (s: Record<string, unknown> & SearchSchemaInput): { sort: SortKey } => {
     const sort = (s.sort as SortKey) || "featured";
     return { sort: SORT_OPTIONS.some((o) => o.value === sort) ? sort : "featured" };
   },
   component: FarmPage,
-  errorComponent: ({ error }) => {
-    const router = useRouter();
-    return (
-      <div className="min-h-screen flex flex-col">
-        <SiteHeader />
-        <main className="flex-1 px-4 md:px-6 py-12 mx-auto max-w-3xl w-full text-center">
-          <h1 className="font-display text-2xl mb-2">Couldn't load this farm</h1>
-          <ErrorComponent error={error} />
-          <button
-            onClick={() => router.invalidate()}
-            className="mt-4 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold"
-          >
-            Try again
-          </button>
-        </main>
-        <SiteFooter />
-      </div>
-    );
-  },
+  errorComponent: FarmErrorComponent,
   notFoundComponent: () => (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />

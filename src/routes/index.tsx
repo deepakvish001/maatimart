@@ -224,7 +224,13 @@ function Home() {
   // Per-deal countdown targets: prefer product.deal_ends_at if present,
   // otherwise fall back to the configured daily schedule (next local midnight).
   const dealTargets = useMemo(
-    () => deals.map((p) => resolveDealEnd((p as any).deal_ends_at ?? null)),
+    () =>
+      deals.map((p) =>
+        // `deal_ends_at` is not part of the products schema today, so this
+        // resolves to the daily schedule. The optional property keeps the
+        // per-product override working if the column is added later.
+        resolveDealEnd((p as { deal_ends_at?: string | null }).deal_ends_at ?? null),
+      ),
     [deals],
   );
 
@@ -841,7 +847,7 @@ function Home() {
                     .replace(/[^a-z0-9]/gi, "")
                     .slice(0, 2)
                     .toUpperCase() || "MM";
-                const product = (r as any).products;
+                const product = r.products;
                 const farmName = product?.farms?.name;
                 return (
                   <article
