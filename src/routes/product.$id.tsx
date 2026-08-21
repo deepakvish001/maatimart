@@ -1,4 +1,5 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, ErrorComponent, useRouter } from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -26,8 +27,47 @@ import { ProductReviews } from "@/components/product-reviews";
 import { getDeliveryEta, etaToneClasses } from "@/lib/delivery-eta";
 import { usePincode } from "@/lib/pincode-store";
 
+function ProductErrorComponent({ error }: ErrorComponentProps) {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 px-4 md:px-6 py-12 mx-auto max-w-3xl w-full text-center">
+        <h1 className="font-display text-2xl mb-2">Couldn't load this product</h1>
+        <ErrorComponent error={error} />
+        <button
+          onClick={() => router.invalidate()}
+          className="mt-4 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold"
+        >
+          Try again
+        </button>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
+  errorComponent: ProductErrorComponent,
+  notFoundComponent: () => (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 px-4 md:px-6 py-12 mx-auto max-w-3xl w-full text-center">
+        <h1 className="font-display text-3xl mb-2">Product not found</h1>
+        <p className="text-muted-foreground mb-6">
+          This product may have sold out or been removed.
+        </p>
+        <Link
+          to="/marketplace"
+          className="rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold"
+        >
+          Browse marketplace
+        </Link>
+      </main>
+      <SiteFooter />
+    </div>
+  ),
 });
 
 function ProductPage() {
